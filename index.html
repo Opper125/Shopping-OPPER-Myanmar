@@ -167,12 +167,17 @@
             encrypted: true
         });
         const channel = pusher.subscribe('orders-' + userId);
+        const productChannel = pusher.subscribe('products');
 
         channel.bind('orderUpdated', (data) => {
             if (data.userId === userId) {
                 fetchOrders();
                 fetchProducts();
             }
+        });
+
+        productChannel.bind('productUpdated', () => {
+            fetchProducts();
         });
 
         async function fetchProducts() {
@@ -278,7 +283,10 @@
             `;
         }
 
-        window.onload = fetchProducts;
+        window.onload = () => {
+            fetchProducts();
+            fetchOrders();
+        };
     </script>
 </body>
 </html>
