@@ -33,24 +33,34 @@
                     <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
                     <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
                     <p>Telegram: @${order.telegramUsername}</p>
+                    <p>User ID: ${order.userId}</p>
                     <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
                     <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
-                    <button class="approve-btn" onclick="updateOrder('${order.id}', 'အတည်ပြု')">လက်ခံ</button>
-                    <button class="reject-btn" onclick="updateOrder('${order.id}', 'ငြင်းဆို')">ငြင်းဆို</button>
+                    ${order.status === 'ဆိုင်းငံ့' ? `
+                        <button class="approve-btn" onclick="updateOrder('${order.id}', 'အတည်ပြု', '${order.productId}')">လက်ခံ</button>
+                        <button class="reject-btn" onclick="updateOrder('${order.id}', 'ငြင်းဆို')">ငြင်းဆို</button>
+                    ` : ''}
                 `;
                 orderList.appendChild(item);
             });
         }
 
-        async function updateOrder(id, status) {
+        async function updateOrder(id, status, productId) {
             await fetch('/.netlify/functions/data', {
                 method: 'POST',
-                body: JSON.stringify({ action: 'updateOrder', id, status })
+                body: JSON.stringify({ action: 'updateOrder', id, status, productId })
             });
+            if (status === 'အတည်ပြု') {
+                await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'markSoldOut', productId })
+                });
+            }
             fetchOrders();
         }
 
         window.onload = fetchOrders;
+        setInterval(fetchOrders, 5000); // 5 စက္ကန့်တိုင်း အပ်ဒိတ်
     </script>
 </body>
 </html>
