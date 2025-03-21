@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload - Shopping OPPER Myanmar</title>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         body { font-family: 'Pyidaungsu', sans-serif; margin: 0; padding: 20px; background: #ecf0f1; }
         .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -12,10 +14,18 @@
         button:hover { background: #3498db; }
         .history { margin-top: 20px; }
         .history-item { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        #login-container { display: block; }
+        #upload-container { display: none; }
     </style>
 </head>
 <body>
-    <div class="form-container">
+    <div class="form-container" id="login-container">
+        <h2>Admin Login</h2>
+        <input type="email" id="email" placeholder="အီးမေးလ်">
+        <input type="password" id="password" placeholder="စကားဝှက်">
+        <button onclick="login()">Login</button>
+    </div>
+    <div class="form-container" id="upload-container">
         <h2>ပစ္စည်းတင်ရန်</h2>
         <input type="file" id="image" accept="image/*" required>
         <input type="text" id="name" placeholder="ပစ္စည်းနာမည်" required>
@@ -24,11 +34,49 @@
         <input type="date" id="date" required>
         <input type="text" id="phone" placeholder="ငွေလွှဲရန် ဖုန်းနံပါတ် (Kpay/Wave)" value="09786284670" readonly>
         <button onclick="uploadProduct()">Upload Order</button>
+        <button onclick="logout()">Logout</button>
 
         <div class="history" id="upload-history"></div>
     </div>
 
     <script>
+        const supabase = Supabase.createClient(
+            'https://mecpzriiiyxyxzbmqasy.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lY3B6cmlpaXl4eXh6Ym1xYXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1OTEyNjcsImV4cCI6MjA1ODE2NzI2N30.pXus4Lt8KeaHt_OLEZMhZUmprYKbTCm-29O5Th1remw'
+        );
+
+        const pusher = new Pusher('8c2540a0c402d0c7aafe', {
+            cluster: 'ap1',
+            encrypted: true
+        });
+        const productChannel = pusher.subscribe('products');
+
+        productChannel.bind('productUpdated', () => {
+            fetchHistory();
+        });
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            if (error) {
+                alert('Login မအောင်မြင်ပါ: ' + error.message);
+            } else {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('upload-container').style.display = 'block';
+                fetchHistory();
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('upload-container').style.display = 'none';
+        }
+
         async function uploadProduct() {
             const image = document.getElementById('image').files[0];
             const name = document.getElementById('name').value;
@@ -40,23 +88,29 @@
             if (image && name && description && price && date && phone) {
                 const imageUrl = await uploadImage(image);
                 if (imageUrl) {
+                    const productData = {
+                        action: 'uploadProduct',
+                        image: imageUrl,
+                        name,
+                        description,
+                        price,
+                        date,
+                        phone,
+                        id: Date.now().toString(),
+                        soldOut: false
+                    };
                     const response = await fetch('/.netlify/functions/data', {
                         method: 'POST',
-                        body: JSON.stringify({
-                            action: 'uploadProduct',
-                            image: imageUrl,
-                            name,
-                            description,
-                            price,
-                            date,
-                            phone,
-                            id: Date.now().toString(),
-                            soldOut: false
-                        })
+                        body: JSON.stringify(productData)
                     });
                     if (response.ok) {
                         alert('ပစ္စည်းတင်ပြီးပါပြီ။');
                         fetchHistory();
+                        document.getElementById('image').value = '';
+                        document.getElementById('name').value = '';
+                        document.getElementById('description').value = '';
+                        document.getElementById('price').value = '';
+                        document.getElementById('date').value = '';
                     } else {
                         alert('ပစ္စည်းတင်ရာတွင် အမှားအယွင်းရှိပါသည်။');
                     }
@@ -126,7 +180,15 @@
             }
         }
 
-        window.onload = fetchHistory;
+        window.onload = () => {
+            supabase.auth.getSession().then(({ data }) => {
+                if (data.session) {
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('upload-container').style.display = 'block';
+                    fetchHistory();
+                }
+            });
+        };
     </script>
 </body>
 </html>
