@@ -21,8 +21,7 @@
 
     <script>
         async function fetchOrders() {
-            const response = await fetch('/.netlify/functions/data?action=getOrders');
-            const orders = await response.json();
+            const response = await fetch('/.netlify          const orders = await response.json();
             const orderList = document.getElementById('order-list');
             orderList.innerHTML = '';
             orders.forEach(order => {
@@ -60,7 +59,6 @@
         }
 
         window.onload = fetchOrders;
-        setInterval(fetchOrders, 5000); // 5 စက္ကန့်တိုင်း အပ်ဒိတ်
     </script>
 </body>
 </html>
