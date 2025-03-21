@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server - Shopping OPPER Myanmar</title>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <style>
         body { font-family: 'Pyidaungsu', sans-serif; margin: 0; padding: 20px; background: #ecf0f1; }
         .order-list { max-width: 800px; margin: 0 auto; }
@@ -20,13 +21,27 @@
     <div class="order-list" id="order-list"></div>
 
     <script>
-        async function fetchOrders() {
-            const response = await fetch('/.netlify          const orders = await response.json();
+        const pusher = new Pusher('8c2540a0c402d0c7aafe', {
+            cluster: 'ap1',
+            encrypted: true
+        });
+        const channel = pusher.subscribe('orders');
+
+        channel.bind('newOrder', (data) => {
+            addOrderToList(data.order);
+        });
+
+        channel.bind('orderUpdated', (data) => {
+            fetchOrders(); // အတည်ပြု/ငြင်းဆိုတဲ့အခါ ပြန်လည်စစ်ဆေးရန်
+        });
+
+        function addOrderToList(order) {
             const orderList = document.getElementById('order-list');
-            orderList.innerHTML = '';
-            orders.forEach(order => {
+            const existingOrder = document.querySelector(`.order-item[data-id="${order.id}"]`);
+            if (!existingOrder) {
                 const item = document.createElement('div');
                 item.className = 'order-item';
+                item.setAttribute('data-id', order.id);
                 item.innerHTML = `
                     <p>ပစ္စည်း: ${order.productName}</p>
                     <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
@@ -36,20 +51,28 @@
                     <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
                     <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
                     ${order.status === 'ဆိုင်းငံ့' ? `
-                        <button class="approve-btn" onclick="updateOrder('${order.id}', 'အတည်ပြု', '${order.productId}')">လက်ခံ</button>
-                        <button class="reject-btn" onclick="updateOrder('${order.id}', 'ငြင်းဆို')">ငြင်းဆို</button>
+                        <button class="approve-btn" onclick="updateOrder('${order.id}', 'အတည်ပြု', '${order.productId}', '${order.userId}')">လက်ခံ</button>
+                        <button class="reject-btn" onclick="updateOrder('${order.id}', 'ငြင်းဆို', null, '${order.userId}')">ငြင်းဆို</button>
                     ` : ''}
                 `;
-                orderList.appendChild(item);
-            });
+                orderList.prepend(item);
+            }
         }
 
-        async function updateOrder(id, status, productId) {
+        async function fetchOrders() {
+            const response = await fetch('/.netlify/functions/data?action=getOrders');
+            const orders = await response.json();
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '';
+            orders.forEach(order => addOrderToList(order));
+        }
+
+        async function updateOrder(id, status, productId, userId) {
             await fetch('/.netlify/functions/data', {
                 method: 'POST',
-                body: JSON.stringify({ action: 'updateOrder', id, status, productId })
+                body: JSON.stringify({ action: 'updateOrder', id, status, productId, userId })
             });
-            if (status === 'အတည်ပြု') {
+            if (status === 'အတည်ပြု' && productId) {
                 await fetch('/.netlify/functions/data', {
                     method: 'POST',
                     body: JSON.stringify({ action: 'markSoldOut', productId })
