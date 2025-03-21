@@ -83,11 +83,13 @@
         }
         .sold-out {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 100px;
-            height: 100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
             opacity: 0.9;
+            z-index: 1;
         }
         .order-btn {
             background: #27ae60;
@@ -97,6 +99,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s ease;
+            width: 100%;
         }
         .order-btn:hover {
             background: #219653;
@@ -109,10 +112,15 @@
             display: flex;
             align-items: center;
             margin: 5px 0;
+            background: #f1f1f1;
+            padding: 5px;
+            border-radius: 5px;
         }
         .payment-option img {
-            width: 25px;
-            margin-right: 8px;
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 3px;
         }
         .status-pending { background: rgba(241, 196, 15, 0.3); padding: 5px; border-radius: 3px; }
         .status-approved { background: rgba(46, 204, 113, 0.3); padding: 5px; border-radius: 3px; }
@@ -190,18 +198,20 @@
             const orderList = document.getElementById('order-list');
             orderList.innerHTML = '';
             orders.forEach(order => {
-                const card = document.createElement('div');
-                card.className = 'order-card';
-                card.innerHTML = `
-                    <img src="${order.productImage}" alt="${order.productName}">
-                    <h3>${order.productName}</h3>
-                    <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
-                    <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
-                    <p>Telegram: @${order.telegramUsername}</p>
-                    <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
-                    <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
-                `;
-                orderList.appendChild(card);
+                if (order.userId === userId) {
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    card.innerHTML = `
+                        <img src="${order.productImage}" alt="${order.productName}">
+                        <h3>${order.productName}</h3>
+                        <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
+                        <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
+                        <p>Telegram: @${order.telegramUsername}</p>
+                        <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
+                        <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
+                    `;
+                    orderList.appendChild(card);
+                }
             });
         }
 
@@ -252,13 +262,7 @@
             `;
         }
 
-        window.onload = () => {
-            fetchProducts();
-            setInterval(() => {
-                fetchProducts();
-                if (document.getElementById('order-list').style.display === 'grid') fetchOrders();
-            }, 5000); // 5 စက္ကန့်တိုင်း အပ်ဒိတ်လုပ်မယ်
-        };
+        window.onload = fetchProducts;
     </script>
 </body>
 </html>
