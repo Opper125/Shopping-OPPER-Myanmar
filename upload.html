@@ -49,7 +49,8 @@
                         price,
                         date,
                         phone,
-                        id: Date.now().toString()
+                        id: Date.now().toString(),
+                        soldOut: false
                     })
                 });
                 alert('ပစ္စည်းတင်ပြီးပါပြီ။');
@@ -78,7 +79,7 @@
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.innerHTML = `
-                    ${product.name} - ${product.price} MMK
+                    ${product.name} - ${product.price} MMK ${product.soldOut ? '(Sold Out)' : ''}
                     <button onclick="deleteProduct('${product.id}')">ဖျက်မည်</button>
                     <button onclick="editProduct('${product.id}')">ပြင်မည်</button>
                 `;
