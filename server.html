@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - Shopping OPPER Myanmar</title>
+    <style>
+        body { font-family: 'Pyidaungsu', sans-serif; margin: 0; padding: 20px; background: #ecf0f1; }
+        .order-list { max-width: 800px; margin: 0 auto; }
+        .order-item { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status-pending { background: rgba(241, 196, 15, 0.3); padding: 5px; border-radius: 3px; }
+        .status-approved { background: rgba(46, 204, 113, 0.3); padding: 5px; border-radius: 3px; }
+        .status-rejected { background: rgba(231, 76, 60, 0.3); padding: 5px; border-radius: 3px; }
+        button { padding: 5px 10px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .approve-btn { background: #2ecc71; color: white; }
+        .reject-btn { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="order-list" id="order-list"></div>
+
+    <script>
+        async function fetchOrders() {
+            const response = await fetch('/.netlify/functions/data?action=getOrders');
+            const orders = await response.json();
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '';
+            orders.forEach(order => {
+                const item = document.createElement('div');
+                item.className = 'order-item';
+                item.innerHTML = `
+                    <p>ပစ္စည်း: ${order.productName}</p>
+                    <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
+                    <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
+                    <p>Telegram: @${order.telegramUsername}</p>
+                    <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
+                    <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
+                    <button class="approve-btn" onclick="updateOrder('${order.id}', 'အတည်ပြု')">လက်ခံ</button>
+                    <button class="reject-btn" onclick="updateOrder('${order.id}', 'ငြင်းဆို')">ငြင်းဆို</button>
+                `;
+                orderList.appendChild(item);
+            });
+        }
+
+        async function updateOrder(id, status) {
+            await fetch('/.netlify/functions/data', {
+                method: 'POST',
+                body: JSON.stringify({ action: 'updateOrder', id, status })
+            });
+            fetchOrders();
+        }
+
+        window.onload = fetchOrders;
+    </script>
+</body>
+</html>
