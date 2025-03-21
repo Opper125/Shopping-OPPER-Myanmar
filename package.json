@@ -1,0 +1,12 @@
+{
+  "name": "shoppin-opper-myanmar",
+  "version": "1.0.0",
+  "description": "Shopping OPPER Myanmar Website",
+  "main": "index.html",
+  "scripts": {
+    "start": "netlify dev"
+  },
+  "dependencies": {
+    "netlify-cli": "^10.0.0"
+  }
+}
