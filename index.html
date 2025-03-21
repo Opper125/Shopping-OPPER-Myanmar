@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping OPPER Myanmar</title>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <style>
         body {
             font-family: 'Pyidaungsu', sans-serif;
@@ -161,6 +162,19 @@
         localStorage.setItem('userId', userId);
         document.getElementById('user-id').textContent = userId;
 
+        const pusher = new Pusher('8c2540a0c402d0c7aafe', {
+            cluster: 'ap1',
+            encrypted: true
+        });
+        const channel = pusher.subscribe('orders-' + userId);
+
+        channel.bind('orderUpdated', (data) => {
+            if (data.userId === userId) {
+                fetchOrders();
+                fetchProducts();
+            }
+        });
+
         async function fetchProducts() {
             const response = await fetch('/.netlify/functions/data?action=getProducts');
             const products = await response.json();
@@ -223,20 +237,22 @@
                 const productResponse = await fetch('/.netlify/functions/data?action=getProducts');
                 const products = await productResponse.json();
                 const product = products.find(p => p.id === productId);
+                const orderData = {
+                    action: 'placeOrder',
+                    productId,
+                    productName: product.name,
+                    productImage: product.image,
+                    transactionId: transactionId.slice(-6),
+                    telegramUsername,
+                    paymentMethod,
+                    status: 'ဆိုင်းငံ့',
+                    orderTime: new Date().toISOString(),
+                    userId,
+                    id: Date.now().toString()
+                };
                 await fetch('/.netlify/functions/data', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        action: 'placeOrder',
-                        productId,
-                        productName: product.name,
-                        productImage: product.image,
-                        transactionId: transactionId.slice(-6),
-                        telegramUsername,
-                        paymentMethod,
-                        status: 'ဆိုင်းငံ့',
-                        orderTime: new Date().toISOString(),
-                        userId
-                    })
+                    body: JSON.stringify(orderData)
                 });
                 alert('မှာယူမှု အောင်မြင်ပါသည်။');
                 fetchProducts();
