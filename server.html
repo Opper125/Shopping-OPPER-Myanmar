@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server - Shopping OPPER Myanmar</title>
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         body { font-family: 'Pyidaungsu', sans-serif; margin: 0; padding: 20px; background: #ecf0f1; }
         .order-list { max-width: 800px; margin: 0 auto; }
@@ -23,8 +22,8 @@
 <body>
     <div id="login-container">
         <h2>Admin Login</h2>
-        <input type="email" id="email" placeholder="အီးမေးလ်">
-        <input type="password" id="password" placeholder="စကားဝှက်">
+        <input type="email" id="email" placeholder="အီးမေးလ်" required>
+        <input type="password" id="password" placeholder="စကားဝှက်" required>
         <button onclick="login()">Login</button>
     </div>
     <div id="order-container">
@@ -33,10 +32,8 @@
     </div>
 
     <script>
-        const supabase = Supabase.createClient(
-            'https://mecpzriiiyxyxzbmqasy.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lY3B6cmlpaXl4eXh6Ym1xYXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1OTEyNjcsImV4cCI6MjA1ODE2NzI2N30.pXus4Lt8KeaHt_OLEZMhZUmprYKbTCm-29O5Th1remw'
-        );
+        const VALID_EMAIL = 'wechatopper@gmail.com';
+        const VALID_PASSWORD = '155872';
 
         const pusher = new Pusher('8c2540a0c402d0c7aafe', {
             cluster: 'ap1',
@@ -57,24 +54,22 @@
             fetchOrders();
         });
 
-        async function login() {
+        function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-            if (error) {
-                alert('Login မအောင်မြင်ပါ: ' + error.message);
-            } else {
+
+            if (email === VALID_EMAIL && password === VALID_PASSWORD) {
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('order-container').style.display = 'block';
                 fetchOrders();
+                localStorage.setItem('isLoggedIn', 'true');
+            } else {
+                alert('အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါ။');
             }
         }
 
-        async function logout() {
-            await supabase.auth.signOut();
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
             document.getElementById('login-container').style.display = 'block';
             document.getElementById('order-container').style.display = 'none';
         }
@@ -104,29 +99,38 @@
         }
 
         async function fetchOrders() {
-            const response = await fetch('/.netlify/functions/data?action=getOrders');
-            const orders = await response.json();
-            const orderList = document.getElementById('order-list');
-            orderList.innerHTML = '';
-            orders.forEach(order => addOrderToList(order));
+            try {
+                const response = await fetch('/.netlify/functions/data?action=getOrders');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                const orders = await response.json();
+                const orderList = document.getElementById('order-list');
+                orderList.innerHTML = '';
+                orders.forEach(order => addOrderToList(order));
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                alert('မှာယူမှုများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+            }
         }
 
         async function updateOrder(id, status, productId, userId) {
-            await fetch('/.netlify/functions/data', {
-                method: 'POST',
-                body: JSON.stringify({ action: 'updateOrder', id, status, productId, userId })
-            });
-            fetchOrders();
+            try {
+                await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'updateOrder', id, status, productId, userId })
+                });
+                fetchOrders();
+            } catch (error) {
+                console.error('Error updating order:', error);
+                alert('မှာယူမှု ပြင်ရာတွင် အမှားဖြစ်ပါသည်။');
+            }
         }
 
         window.onload = () => {
-            supabase.auth.getSession().then(({ data }) => {
-                if (data.session) {
-                    document.getElementById('login-container').style.display = 'none';
-                    document.getElementById('order-container').style.display = 'block';
-                    fetchOrders();
-                }
-            });
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('order-container').style.display = 'block';
+                fetchOrders();
+            }
         };
     </script>
 </body>
