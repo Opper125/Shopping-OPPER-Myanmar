@@ -126,6 +126,24 @@
         .status-pending { background: rgba(241, 196, 15, 0.3); padding: 5px; border-radius: 3px; }
         .status-approved { background: rgba(46, 204, 113, 0.3); padding: 5px; border-radius: 3px; }
         .status-rejected { background: rgba(231, 76, 60, 0.3); padding: 5px; border-radius: 3px; }
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: -300px; /* ဘယ်ဘက်ကနေ စမယ် */
+            transform: translateY(-50%);
+            background: rgba(46, 204, 113, 0.9); /* အစိမ်းရောင် */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 18px;
+            z-index: 1000;
+            animation: slideInOut 3s ease-in-out forwards;
+        }
+        @keyframes slideInOut {
+            0% { left: -300px; }
+            50% { left: 50%; transform: translate(-50%, -50%); }
+            100% { left: 100%; transform: translate(0, -50%); }
+        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -183,9 +201,7 @@
         async function fetchProducts() {
             try {
                 const response = await fetch('/.netlify/functions/data?action=getProducts');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch products');
-                }
+                if (!response.ok) throw new Error('Failed to fetch products');
                 const products = await response.json();
                 const productList = document.getElementById('product-list');
                 productList.innerHTML = '';
@@ -207,7 +223,7 @@
                             <img src="/assets/wave-logo.png" alt="Wave">
                             <span>Wave: 09786284670 (DHMK)</span>
                         </div>
-                        <button class="order-btn" ${product.soldOut ? 'disabled' : ''} onclick="orderProduct('${product.id}')">
+                        <button class="order-btn" ${product.soldOut ? 'disabled' : ''} onclick="orderProduct('${product.id}', '${product.name}', '${product.image}')">
                             ${product.soldOut ? 'Sold Out' : 'မှာယူမည်'}
                         </button>
                     `;
@@ -222,9 +238,7 @@
         async function fetchOrders() {
             try {
                 const response = await fetch('/.netlify/functions/data?action=getOrders');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch orders');
-                }
+                if (!response.ok) throw new Error('Failed to fetch orders');
                 const orders = await response.json();
                 const orderList = document.getElementById('order-list');
                 orderList.innerHTML = '';
@@ -250,23 +264,17 @@
             }
         }
 
-        async function orderProduct(productId) {
+        async function orderProduct(productId, productName, productImage) {
             const paymentMethod = prompt("ငွေလွှဲနည်းလမ်း (Kpay/Wave) ရွေးပါ:");
             const transactionId = prompt("ငွေလွှဲလုပ်ငန်းစဉ် နောက်ဆုံး ၆ လုံးထည့်ပါ:");
             const telegramUsername = prompt("Telegram Username ထည့်ပါ:");
             if (paymentMethod && transactionId && telegramUsername) {
                 try {
-                    const productResponse = await fetch('/.netlify/functions/data?action=getProducts');
-                    if (!productResponse.ok) {
-                        throw new Error('Failed to fetch products for ordering');
-                    }
-                    const products = await productResponse.json();
-                    const product = products.find(p => p.id === productId);
                     const orderData = {
                         action: 'placeOrder',
                         productId,
-                        productName: product.name,
-                        productImage: product.image,
+                        productName,
+                        productImage,
                         transactionId: transactionId.slice(-6),
                         telegramUsername,
                         paymentMethod,
@@ -280,7 +288,7 @@
                         body: JSON.stringify(orderData)
                     });
                     if (response.ok) {
-                        alert('မှာယူမှု အောင်မြင်ပါသည်။');
+                        showSuccessMessage();
                         fetchProducts();
                         fetchOrders();
                     } else {
@@ -291,6 +299,16 @@
                     alert('မှာယူမှု လုပ်ရာတွင် အမှားဖြစ်ပါသည်။');
                 }
             }
+        }
+
+        function showSuccessMessage() {
+            const message = document.createElement('div');
+            message.className = 'success-message';
+            message.textContent = 'အောင်မြင်ပါသည်';
+            document.body.appendChild(message);
+            setTimeout(() => {
+                message.remove();
+            }, 3000); // 3 စက္ကန့်ပြီး ဖျက်မယ်
         }
 
         function showSection(sectionId) {
