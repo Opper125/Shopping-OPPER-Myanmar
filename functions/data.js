@@ -74,7 +74,17 @@ exports.handler = async (event, context) => {
                 };
 
             case 'getOrders':
-                const { data: orders } = await supabase.from('orders').select('*');
+                const userId = event.headers['user-id']; // Request header ကနေ userId ယူမယ်
+                if (!userId) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({ message: 'user-id header is required' })
+                    };
+                }
+                const { data: orders } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('userId', userId); // userId နဲ့ filter လုပ်မယ်
                 return {
                     statusCode: 200,
                     body: JSON.stringify(orders)
