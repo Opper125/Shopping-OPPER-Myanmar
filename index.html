@@ -237,26 +237,28 @@
 
         async function fetchOrders() {
             try {
-                const response = await fetch('/.netlify/functions/data?action=getOrders');
+                const response = await fetch('/.netlify/functions/data?action=getOrders', {
+                    headers: {
+                        'user-id': userId // Header ထဲမှာ userId ထည့်ပေးတယ်
+                    }
+                });
                 if (!response.ok) throw new Error('Failed to fetch orders');
                 const orders = await response.json();
                 const orderList = document.getElementById('order-list');
                 orderList.innerHTML = '';
                 orders.forEach(order => {
-                    if (order.userId === userId) {
-                        const card = document.createElement('div');
-                        card.className = 'order-card';
-                        card.innerHTML = `
-                            <img src="${order.productImage}" alt="${order.productName}">
-                            <h3>${order.productName}</h3>
-                            <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
-                            <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
-                            <p>Telegram: @${order.telegramUsername}</p>
-                            <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
-                            <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
-                        `;
-                        orderList.appendChild(card);
-                    }
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    card.innerHTML = `
+                        <img src="${order.productImage}" alt="${order.productName}">
+                        <h3>${order.productName}</h3>
+                        <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
+                        <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
+                        <p>Telegram: @${order.telegramUsername}</p>
+                        <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
+                        <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
+                    `;
+                    orderList.appendChild(card);
                 });
             } catch (error) {
                 console.error('Error fetching orders:', error);
@@ -334,5 +336,5 @@
             fetchOrders();
         };
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92d02c2b3e03bd34',t:'MTc0NDA5ODYxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
