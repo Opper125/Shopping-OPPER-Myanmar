@@ -4,193 +4,781 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping OPPER Myanmar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <style>
-        body {
-            font-family: 'Pyidaungsu', sans-serif;
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --success-color: #4cc9f0;
+            --warning-color: #ffd166;
+            --danger-color: #ef476f;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --white-color: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            color: #333;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Pyidaungsu', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .header {
-            text-align: center;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
             position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
-        .header img {
+
+        .logo {
             width: 150px;
-            animation: fadeIn 1s ease-in;
+            animation: pulse 2s infinite alternate;
         }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
         .user-id {
             position: absolute;
             top: 10px;
             right: 20px;
             font-size: 14px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+
+        .user-id i {
+            font-size: 16px;
+        }
+
         .nav {
-            background: #2c3e50;
-            padding: 10px 0;
+            background: var(--dark-color);
+            padding: 15px 0;
             position: fixed;
             bottom: 0;
             width: 100%;
             display: flex;
             justify-content: space-around;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
         }
+
         .nav a {
-            color: white;
+            color: var(--light-color);
             text-decoration: none;
             font-size: 16px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            padding: 5px 15px;
+            border-radius: 30px;
         }
-        .nav a:hover {
-            color: #3498db;
-            transform: scale(1.1);
+
+        .nav a:hover, .nav a.active {
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
         }
-        .nav img {
-            width: 20px;
-            margin-right: 5px;
+
+        .nav a i {
+            font-size: 20px;
+            margin-bottom: 5px;
         }
-        .products, .orders {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 60px;
-        }
-        .product-card, .order-card {
+
+        .search-bar {
+            display: flex;
+            align-items: center;
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            animation: slideIn 0.5s ease;
-            position: relative;
-        }
-        .product-card img, .order-card img {
+            border-radius: 30px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
             width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 5px;
+            max-width: 600px;
+            margin: 0 auto 20px;
         }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--secondary-color);
+        }
+
+        .products, .orders, .posts, .signup-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 80px;
+        }
+
+        .product-card, .order-card, .post-card {
+            background: var(--white-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            position: relative;
+            height: 200px;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .sold-out {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) rotate(-15deg);
             width: 150px;
             height: 150px;
-            opacity: 0.9;
-            z-index: 1;
+            z-index: 2;
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
         }
-        .order-btn {
-            background: #27ae60;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            width: 100%;
+
+        .product-info {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
-        .order-btn:hover {
-            background: #219653;
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark-color);
         }
-        .order-btn:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
+
+        .product-description {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-bottom: 10px;
+            flex: 1;
         }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .product-date {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .payment-options {
+            margin: 10px 0;
+        }
+
         .payment-option {
             display: flex;
             align-items: center;
-            margin: 5px 0;
-            background: #f1f1f1;
-            padding: 5px;
-            border-radius: 5px;
+            margin: 8px 0;
+            background: var(--light-color);
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: var(--transition);
         }
+
+        .payment-option:hover {
+            background: #e9ecef;
+        }
+
         .payment-option img {
             width: 30px;
             height: 30px;
+            object-fit: contain;
             margin-right: 10px;
-            border-radius: 3px;
+            border-radius: 5px;
         }
-        .status-pending { background: rgba(241, 196, 15, 0.3); padding: 5px; border-radius: 3px; }
-        .status-approved { background: rgba(46, 204, 113, 0.3); padding: 5px; border-radius: 3px; }
-        .status-rejected { background: rgba(231, 76, 60, 0.3); padding: 5px; border-radius: 3px; }
+
+        .payment-option span {
+            font-size: 14px;
+            color: var(--dark-color);
+        }
+
+        .order-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-btn:hover:not(:disabled) {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .order-btn:disabled {
+            background: var(--gray-color);
+            cursor: not-allowed;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+
+        .status-pending {
+            background: rgba(255, 209, 102, 0.3);
+            color: #b68d00;
+        }
+
+        .status-approved {
+            background: rgba(76, 201, 240, 0.3);
+            color: #0077b6;
+        }
+
+        .status-rejected {
+            background: rgba(239, 71, 111, 0.3);
+            color: #ef476f;
+        }
+
         .success-message {
             position: fixed;
             top: 50%;
-            left: -300px; /* ဘယ်ဘက်ကနေ စမယ် */
+            left: -300px;
             transform: translateY(-50%);
-            background: rgba(46, 204, 113, 0.9); /* အစိမ်းရောင် */
+            background: var(--success-color);
             color: white;
             padding: 15px 30px;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 18px;
             z-index: 1000;
+            box-shadow: var(--shadow);
             animation: slideInOut 3s ease-in-out forwards;
         }
+
         @keyframes slideInOut {
             0% { left: -300px; }
-            50% { left: 50%; transform: translate(-50%, -50%); }
+            20%, 80% { left: 50%; transform: translate(-50%, -50%); }
             100% { left: 100%; transform: translate(0, -50%); }
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            overflow: auto;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        @media (max-width: 600px) {
-            .nav a { font-size: 14px; }
-            .product-card, .order-card { margin: 10px; }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-color);
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+        
+        .about-section {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .about-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .about-section p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .about-section a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .about-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sign up form styles */
+        .signup-container {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .signup-container h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Upload post section */
+        .upload-post {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .upload-post h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .post-card {
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        .post-header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .post-avatar i {
+            font-size: 20px;
+            color: var(--gray-color);
+        }
+
+        .post-author {
+            font-weight: 500;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .post-content {
+            padding: 0 15px 15px;
+        }
+
+        .post-media img, .post-media video {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .post-text {
+            line-height: 1.6;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .post-actions button {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .post-actions button:hover {
+            color: var(--primary-color);
+        }
+
+        .post-actions i {
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .products, .orders, .posts {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .header {
+                margin-bottom: 15px;
+            }
+            
+            .user-id {
+                position: static;
+                margin-top: 10px;
+            }
+            
+            .nav a {
+                font-size: 14px;
+            }
+            
+            .nav a i {
+                font-size: 18px;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+
+        /* Custom audio player */
+        .audio-player {
+            display: none;
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            width: 100%;
+            background: rgba(33, 37, 41, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px;
+            z-index: 999;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .audio-play-btn, .audio-pause-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .audio-title {
+            font-size: 14px;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="/assets/logo.png" alt="OPPER Logo">
-            <div class="user-id">ID: <span id="user-id"></span></div>
-        </div>
-        <div id="content">
-            <div class="products" id="product-list"></div>
-            <div class="orders" id="order-list" style="display: none;"></div>
+    <!-- Audio Player -->
+    <div class="audio-player" id="audio-player">
+        <audio id="background-music" loop>
+            <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mp3">
+        </audio>
+        <div class="audio-controls">
+            <button class="audio-play-btn" id="audio-play"><i class="fas fa-play"></i></button>
+            <button class="audio-pause-btn" id="audio-pause" style="display:none"><i class="fas fa-pause"></i></button>
+            <span class="audio-title">OPPER Shopping - Background Music</span>
         </div>
     </div>
+
+    <div class="container">
+        <div class="header">
+            <img src="https://i.imgur.com/YtCgVQE.png" alt="OPPER Logo" class="logo" id="logo">
+            <div class="user-id"><i class="fas fa-user-circle"></i> ID: <span id="user-id"></span></div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="ပစ္စည်းကို ရှာရန်...">
+            <button id="search-btn"><i class="fas fa-search"></i> ရှာဖွေရန်</button>
+        </div>
+
+        <div id="content">
+            <!-- Products Section -->
+            <div class="products" id="product-list"></div>
+            
+            <!-- Orders Section -->
+            <div class="orders" id="order-list" style="display: none;"></div>
+            
+            <!-- Posts/News Section -->
+            <div class="posts" id="posts-list" style="display: none;"></div>
+            
+            <!-- About Section -->
+            <div class="about-section" id="about-section" style="display: none;">
+                <h2>ကျွန်ုပ်တို့အကြောင်း</h2>
+                <p><i class="fas fa-envelope"></i> Email: crakb68@gmail.com</p>
+                <p><i class="fas fa-phone"></i> Phone: 09983254678</p>
+                <p><i class="fab fa-telegram"></i> Telegram: <a href="https://t.me/OPPERN" target="_blank">t.me/OPPERN</a></p>
+                <p><i class="fas fa-map-marker-alt"></i> လိပ်စာ: Yangon No 34, Ayarwade GG 9</p>
+            </div>
+            
+            <!-- Sign Up Section -->
+            <div class="signup-container" id="signup-section" style="display: none;">
+                <h2>အကောင့်အသစ်ဖွင့်ရန်</h2>
+                <div class="form-group">
+                    <label for="signup-name">အမည်</label>
+                    <input type="text" id="signup-name" class="form-control" placeholder="အမည် ထည့်ပါ" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">အီးမေးလ်</label>
+                    <input type="email" id="signup-email" class="form-control" placeholder="အီးမေးလ် ထည့်ပါ" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-phone">ဖုန်းနံပါတ်</label>
+                    <input type="tel" id="signup-phone" class="form-control" placeholder="ဖုန်းနံပါတ် ထည့်ပါ" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">စကားဝှက်</label>
+                    <input type="password" id="signup-password" class="form-control" placeholder="စကားဝှက် ထည့်ပါ" required>
+                </div>
+                <button class="btn btn-primary" id="signup-btn">အကောင့်ဖွင့်မည်</button>
+            </div>
+            
+            <!-- Upload Post Section -->
+            <div class="upload-post" id="upload-section" style="display: none;">
+                <h3>ပစ္စည်းအကြောင်း မျှဝေရန်</h3>
+                <div class="form-group">
+                    <label for="post-text">ပစ္စည်းအကြောင်း ရေးရန်</label>
+                    <textarea id="post-text" class="form-control" rows="3" placeholder="ဘာအကြောင်းရေးချင်လဲ..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="post-media">ဓာတ်ပုံ သို့မဟုတ် ဗီဒီယို ထည့်ရန်</label>
+                    <input type="file" id="post-media" class="form-control" accept="image/*,video/*">
+                </div>
+                <button class="btn btn-primary" id="post-btn">ပို့စ်တင်မည်</button>
+                
+                <div id="posts-container" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
     <div class="nav">
-        <a href="#home" onclick="showSection('product-list')"><img src="/assets/home-icon.png" alt="Home">Home</a>
-        <a href="#orderhost" onclick="showSection('order-list')"><img src="/assets/order-icon.png" alt="Order">Orderhost</a>
-        <a href="#about" onclick="showAbout()"><img src="/assets/about-icon.png" alt="About">About</a>
+        <a href="#home" class="active" id="nav-home"><i class="fas fa-home"></i> Home</a>
+        <a href="#orders" id="nav-orders"><i class="fas fa-shopping-bag"></i> မှာယူမှုများ</a>
+        <a href="#posts" id="nav-posts"><i class="fas fa-newspaper"></i> ပို့စ်များ</a>
+        <a href="#signup" id="nav-signup"><i class="fas fa-user-plus"></i> အကောင့်ဖွင့်ရန်</a>
+        <a href="#about" id="nav-about"><i class="fas fa-info-circle"></i> အကြောင်း</a>
+    </div>
+
+    <!-- Modal for Order -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-order-modal">&times;</span>
+            <h2 id="order-product-name"></h2>
+            <div class="form-group">
+                <label for="payment-method">ငွေလွှဲနည်းလမ်း ရွေးပါ</label>
+                <select id="payment-method" class="form-control">
+                    <option value="Kpay">Kpay</option>
+                    <option value="Wave">Wave</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transaction-id">ငွေလွှဲလုပ်ငန်းစဉ် နောက်ဆုံး ၆ လုံးထည့်ပါ</label>
+                <input type="text" id="transaction-id" class="form-control" maxlength="6" placeholder="123456">
+            </div>
+            <div class="form-group">
+                <label for="telegram-username">Telegram Username ထည့်ပါ</label>
+                <input type="text" id="telegram-username" class="form-control" placeholder="@username">
+            </div>
+            <div class="form-group">
+                <label for="shipping-address">ပို့ဆောင်ရမည့်လိပ်စာ</label>
+                <textarea id="shipping-address" class="form-control" rows="3" placeholder="အိမ်လိပ်စာအပြည့်အစုံ ထည့်သွင်းပါ"></textarea>
+            </div>
+            <button class="btn btn-primary" id="confirm-order-btn">မှာယူမည်</button>
+        </div>
     </div>
 
     <script>
+        // USER IDENTIFICATION
         const userId = localStorage.getItem('userId') || Math.random().toString(36).substr(2, 6);
         localStorage.setItem('userId', userId);
         document.getElementById('user-id').textContent = userId;
 
+        // PUSHER CONFIGURATION
         const pusher = new Pusher('8c2540a0c402d0c7aafe', {
             cluster: 'ap1',
             encrypted: true
         });
         const channel = pusher.subscribe('orders-' + userId);
         const productChannel = pusher.subscribe('products');
+        const postsChannel = pusher.subscribe('posts');
 
+        // REAL-TIME UPDATES
         channel.bind('orderUpdated', (data) => {
             if (data.userId === userId) {
                 fetchOrders();
                 fetchProducts();
+                showSuccessMessage('အော်ဒါ အခြေအနေ ပြောင်းလဲသွားပါပြီ!');
             }
         });
 
@@ -198,143 +786,525 @@
             fetchProducts();
         });
 
+        postsChannel.bind('postUpdated', () => {
+            fetchPosts();
+        });
+
+        // LOCAL STORAGE FOR USER ACCOUNT 
+        function saveUserToLocalStorage(user) {
+            localStorage.setItem('opperUser', JSON.stringify(user));
+        }
+
+        function getUserFromLocalStorage() {
+            const user = localStorage.getItem('opperUser');
+            return user ? JSON.parse(user) : null;
+        }
+
+        // DATABASE INTERACTIONS
         async function fetchProducts() {
             try {
                 const response = await fetch('/.netlify/functions/data?action=getProducts');
                 if (!response.ok) throw new Error('Failed to fetch products');
                 const products = await response.json();
-                const productList = document.getElementById('product-list');
-                productList.innerHTML = '';
-                products.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        ${product.soldOut ? '<img src="/assets/soldout-icon.png" class="sold-out" alt="Sold Out">' : ''}
-                        <img src="${product.image}" alt="${product.name}">
-                        <h3>${product.name}</h3>
-                        <p>${product.description}</p>
-                        <p>တန်ဖိုး: ${product.price} MMK</p>
-                        <p>ရက်စွဲ: ${product.date}</p>
-                        <div class="payment-option">
-                            <img src="/assets/kpay-logo.png" alt="Kpay">
-                            <span>Kpay: 09786284670 (DHMK)</span>
-                        </div>
-                        <div class="payment-option">
-                            <img src="/assets/wave-logo.png" alt="Wave">
-                            <span>Wave: 09786284670 (DHMK)</span>
-                        </div>
-                        <button class="order-btn" ${product.soldOut ? 'disabled' : ''} onclick="orderProduct('${product.id}', '${product.name}', '${product.image}')">
-                            ${product.soldOut ? 'Sold Out' : 'မှာယူမည်'}
-                        </button>
-                    `;
-                    productList.appendChild(card);
-                });
+                displayProducts(products);
             } catch (error) {
                 console.error('Error fetching products:', error);
-                alert('ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                showErrorMessage('ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
             }
         }
 
         async function fetchOrders() {
             try {
-                const response = await fetch('/.netlify/functions/data?action=getOrders', {
-                    headers: {
-                        'user-id': userId // Header ထဲမှာ userId ထည့်ပေးတယ်
-                    }
-                });
+                const response = await fetch('/.netlify/functions/data?action=getOrders');
                 if (!response.ok) throw new Error('Failed to fetch orders');
                 const orders = await response.json();
-                const orderList = document.getElementById('order-list');
-                orderList.innerHTML = '';
-                orders.forEach(order => {
-                    const card = document.createElement('div');
-                    card.className = 'order-card';
-                    card.innerHTML = `
-                        <img src="${order.productImage}" alt="${order.productName}">
-                        <h3>${order.productName}</h3>
-                        <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
-                        <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
-                        <p>Telegram: @${order.telegramUsername}</p>
-                        <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
-                        <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
-                    `;
-                    orderList.appendChild(card);
-                });
+                displayOrders(orders);
             } catch (error) {
                 console.error('Error fetching orders:', error);
-                alert('မှာယူမှုများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                showErrorMessage('မှာယူမှုများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
             }
         }
 
-        async function orderProduct(productId, productName, productImage) {
-            const paymentMethod = prompt("ငွေလွှဲနည်းလမ်း (Kpay/Wave) ရွေးပါ:");
-            const transactionId = prompt("ငွေလွှဲလုပ်ငန်းစဉ် နောက်ဆုံး ၆ လုံးထည့်ပါ:");
-            const telegramUsername = prompt("Telegram Username ထည့်ပါ:");
-            if (paymentMethod && transactionId && telegramUsername) {
-                try {
-                    const orderData = {
-                        action: 'placeOrder',
-                        productId,
-                        productName,
-                        productImage,
-                        transactionId: transactionId.slice(-6),
-                        telegramUsername,
-                        paymentMethod,
-                        status: 'ဆိုင်းငံ့',
-                        orderTime: new Date().toISOString(),
-                        userId,
-                        id: Date.now().toString()
-                    };
-                    const response = await fetch('/.netlify/functions/data', {
-                        method: 'POST',
-                        body: JSON.stringify(orderData)
-                    });
-                    if (response.ok) {
-                        showSuccessMessage();
-                        fetchProducts();
-                        fetchOrders();
-                    } else {
-                        alert('မှာယူမှု မအောင်မြင်ပါ။');
+        async function fetchPosts() {
+            try {
+                // In a real app, you would fetch posts from a database
+                // For this example, we'll use dummy data
+                const posts = [
+                    {
+                        id: '1',
+                        author: 'Admin',
+                        time: '2023-05-01T10:30:00',
+                        text: 'နောက်ဆုံးရ စျေးနှုန်းလျှော့လျော့စျေး စခဲ့ပြီ။ ယခုပဲစျေးဝယ်လိုက်ပါ!',
+                        image: 'https://i.imgur.com/jIbBg7r.jpg',
+                        likes: 24,
+                        comments: 5
+                    },
+                    {
+                        id: '2',
+                        author: 'Marketing',
+                        time: '2023-04-28T15:45:00',
+                        text: 'အသစ်အသစ်သော ကုန်ပစ္စည်းများ ရောက်ရှိလာပါပြီ။',
+                        video: 'https://assets.mixkit.co/videos/preview/mixkit-shopping-bag-full-of-items-4549-large.mp4',
+                        likes: 18,
+                        comments: 3
                     }
-                } catch (error) {
-                    console.error('Error placing order:', error);
-                    alert('မှာယူမှု လုပ်ရာတွင် အမှားဖြစ်ပါသည်။');
-                }
+                ];
+                displayPosts(posts);
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+                showErrorMessage('ပို့စ်များ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
             }
         }
 
-        function showSuccessMessage() {
-            const message = document.createElement('div');
-            message.className = 'success-message';
-            message.textContent = 'အောင်မြင်ပါသည်';
-            document.body.appendChild(message);
-            setTimeout(() => {
-                message.remove();
-            }, 3000); // 3 စက္ကန့်ပြီး ဖျက်မယ်
+        // DISPLAY FUNCTIONS
+        function displayProducts(products) {
+            const productList = document.getElementById('product-list');
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            
+            productList.innerHTML = '';
+            
+            const filteredProducts = searchInput 
+                ? products.filter(p => p.name.toLowerCase().includes(searchInput) || p.description.toLowerCase().includes(searchInput))
+                : products;
+            
+            if (filteredProducts.length === 0) {
+                productList.innerHTML = '<div class="no-results">ရှာဖွေသော ပစ္စည်းမရှိပါ</div>';
+                return;
+            }
+            
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                card.innerHTML = `
+                    <div class="product-image">
+                        ${product.soldOut ? '<img src="https://i.imgur.com/zEA9t8M.png" class="sold-out" alt="Sold Out">' : ''}
+                        <img src="${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-meta">
+                            <span class="product-price">${product.price} MMK</span>
+                            <span class="product-date">${product.date}</span>
+                        </div>
+                        <div class="payment-options">
+                            <div class="payment-option">
+                                <img src="https://i.imgur.com/3yrdHNj.png" alt="Kpay">
+                                <span>Kpay: 09786284670 (DHMK)</span>
+                            </div>
+                            <div class="payment-option">
+                                <img src="https://i.imgur.com/EAkS1XR.png" alt="Wave">
+                                <span>Wave: 09786284670 (DHMK)</span>
+                            </div>
+                        </div>
+                        <button class="order-btn" ${product.soldOut ? 'disabled' : ''} onclick="openOrderModal('${product.id}', '${product.name}', '${product.image}')">
+                            <i class="fas ${product.soldOut ? 'fa-ban' : 'fa-shopping-cart'}"></i>
+                            ${product.soldOut ? 'ရောင်းကုန်ပါပြီ' : 'မှာယူမည်'}
+                        </button>
+                    </div>
+                `;
+                
+                productList.appendChild(card);
+            });
         }
 
+        function displayOrders(orders) {
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '';
+            
+            const userOrders = orders.filter(order => order.userId === userId);
+            
+            if (userOrders.length === 0) {
+                orderList.innerHTML = '<div class="no-results">မှာယူထားသော ပစ္စည်းမရှိသေးပါ</div>';
+                return;
+            }
+            
+            userOrders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                card.innerHTML = `
+                    <div class="product-image">
+                        <img src="${order.productImage}" alt="${order.productName}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${order.productName}</h3>
+                        <p><i class="fas fa-money-bill-wave"></i> ငွေလွှဲနည်း: ${order.paymentMethod}</p>
+                        <p><i class="fas fa-hashtag"></i> ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
+                        <p><i class="fab fa-telegram"></i> Telegram: @${order.telegramUsername}</p>
+                        <p><i class="fas fa-clock"></i> အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
+                        <p><i class="fas fa-info-circle"></i> အခြေအနေ: 
+                            <span class="status-badge ${order.status === 'ဆိုင်းငံ့' ? 'status-pending' : order.status === 'အတည်ပြု' ? 'status-approved' : 'status-rejected'}">
+                                ${order.status}
+                            </span>
+                        </p>
+                    </div>
+                `;
+                
+                orderList.appendChild(card);
+            });
+        }
+
+        function displayPosts(posts) {
+            const postsList = document.getElementById('posts-container');
+            postsList.innerHTML = '';
+            
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                
+                let mediaContent = '';
+                if (post.image) {
+                    mediaContent = `<img src="${post.image}" alt="Post Image">`;
+                } else if (post.video) {
+                    mediaContent = `<video controls><source src="${post.video}" type="video/mp4"></video>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="post-author">${post.author}</div>
+                            <div class="post-time">${new Date(post.time).toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p class="post-text">${post.text}</p>
+                        ${mediaContent ? `<div class="post-media">${mediaContent}</div>` : ''}
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-like-btn" data-id="${post.id}"><i class="far fa-thumbs-up"></i> ${post.likes} လိုက်</button>
+                        <button class="post-comment-btn" data-id="${post.id}"><i class="far fa-comment"></i> ${post.comments} မှတ်ချက်</button>
+                        <button class="post-share-btn" data-id="${post.id}"><i class="fas fa-share"></i> မျှဝေမည်</button>
+                    </div>
+                `;
+                
+                postsList.appendChild(card);
+            });
+            
+            // Add event listeners to the post action buttons
+            document.querySelectorAll('.post-like-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showSuccessMessage('ဤစာမျက်နှာကို လိုက်လိုက်ပါပြီ!');
+                    btn.innerHTML = `<i class="fas fa-thumbs-up"></i> ${parseInt(btn.textContent.match(/\d+/)[0]) + 1} လိုက်`;
+                });
+            });
+            
+            document.querySelectorAll('.post-comment-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const comment = prompt('သင့်ရဲ့မှတ်ချက်ကို ရေးပါ:');
+                    if (comment) {
+                        showSuccessMessage('မှတ်ချက်ထည့်သွင်းမှု အောင်မြင်ပါသည်');
+                        btn.innerHTML = `<i class="far fa-comment"></i> ${parseInt(btn.textContent.match(/\d+/)[0]) + 1} မှတ်ချက်`;
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.post-share-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showSuccessMessage('မျှဝေမှု အောင်မြင်ပါသည်');
+                });
+            });
+        }
+
+        // ORDER FUNCTIONALITY
+        function openOrderModal(productId, productName, productImage) {
+            document.getElementById('order-product-name').textContent = productName;
+            document.getElementById('order-modal').style.display = 'flex';
+            
+            // Store the product information in the modal for later use
+            document.getElementById('confirm-order-btn').dataset.productId = productId;
+            document.getElementById('confirm-order-btn').dataset.productName = productName;
+            document.getElementById('confirm-order-btn').dataset.productImage = productImage;
+            
+            // Play a sound when opening the modal
+            playSound('https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3');
+        }
+
+        async function placeOrder() {
+            const productId = document.getElementById('confirm-order-btn').dataset.productId;
+            const productName = document.getElementById('confirm-order-btn').dataset.productName;
+            const productImage = document.getElementById('confirm-order-btn').dataset.productImage;
+            const paymentMethod = document.getElementById('payment-method').value;
+            const transactionId = document.getElementById('transaction-id').value;
+            const telegramUsername = document.getElementById('telegram-username').value;
+            const shippingAddress = document.getElementById('shipping-address').value;
+            
+            if (!transactionId || transactionId.length !== 6) {
+                showErrorMessage('ငွေလွှဲနံပါတ် ၆ လုံးကို ထည့်ပါ');
+                return;
+            }
+            
+            if (!telegramUsername) {
+                showErrorMessage('Telegram Username ထည့်ပါ');
+                return;
+            }
+            
+            if (!shippingAddress) {
+                showErrorMessage('ပို့ဆောင်ရမည့်လိပ်စာ ထည့်ပါ');
+                return;
+            }
+            
+            try {
+                const orderData = {
+                    action: 'placeOrder',
+                    productId,
+                    productName,
+                    productImage,
+                    transactionId: transactionId,
+                    telegramUsername: telegramUsername.replace('@', ''),
+                    paymentMethod,
+                    shippingAddress,
+                    status: 'ဆိုင်းငံ့',
+                    orderTime: new Date().toISOString(),
+                    userId,
+                    id: Date.now().toString()
+                };
+                
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('order-modal').style.display = 'none';
+                    resetOrderForm();
+                    showSuccessMessage('အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်');
+                    fetchProducts();
+                    fetchOrders();
+                    // Play success sound
+                    playSound('https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-win-1936.mp3');
+                } else {
+                    showErrorMessage('မှာယူမှု မအောင်မြင်ပါ။');
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                showErrorMessage('မှာယူမှု လုပ်ရာတွင် အမှားဖြစ်ပါသည်။');
+            }
+        }
+
+        function resetOrderForm() {
+            document.getElementById('payment-method').value = 'Kpay';
+            document.getElementById('transaction-id').value = '';
+            document.getElementById('telegram-username').value = '';
+            document.getElementById('shipping-address').value = '';
+        }
+
+        // USER ACCOUNT FUNCTIONALITY
+        function createUserAccount() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const phone = document.getElementById('signup-phone').value;
+            const password = document.getElementById('signup-password').value;
+            
+            if (!name || !email || !phone || !password) {
+                showErrorMessage('အကွက်အားလုံး ဖြည့်ပါ');
+                return;
+            }
+            
+            // Create a user object
+            const user = {
+                id: userId,
+                name,
+                email,
+                phone,
+                createdAt: new Date().toISOString()
+            };
+            
+            // In a real app, this would be sent to a database
+            // For this example, we'll just save to localStorage
+            saveUserToLocalStorage(user);
+            showSuccessMessage('အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်');
+            
+            // Reset form and update UI
+            document.getElementById('signup-name').value = '';
+            document.getElementById('signup-email').value = '';
+            document.getElementById('signup-phone').value = '';
+            document.getElementById('signup-password').value = '';
+            
+            // Show home section
+            showSection('product-list');
+        }
+
+        // POST FUNCTIONALITY
+        function createPost() {
+            const text = document.getElementById('post-text').value;
+            const mediaInput = document.getElementById('post-media');
+            const file = mediaInput.files[0];
+            
+            if (!text && !file) {
+                showErrorMessage('စာသားဖြစ်စေ ဓာတ်ပုံ/ဗီဒီယိုဖြစ်စေ တစ်ခုခုထည့်ပါ');
+                return;
+            }
+            
+            // In a real app, we would upload the file and save the post to a database
+            // For this example, we'll just show a success message and reset the form
+            showSuccessMessage('ပို့စ်တင်ခြင်း အောင်မြင်ပါသည်');
+            
+            document.getElementById('post-text').value = '';
+            mediaInput.value = '';
+            
+            // Refresh posts list
+            fetchPosts();
+        }
+
+        // UI HELPERS
         function showSection(sectionId) {
-            document.getElementById('product-list').style.display = sectionId === 'product-list' ? 'grid' : 'none';
-            document.getElementById('order-list').style.display = sectionId === 'order-list' ? 'grid' : 'none';
-            if (sectionId === 'product-list') fetchProducts();
-            if (sectionId === 'order-list') fetchOrders();
+            // Hide all sections
+            document.getElementById('product-list').style.display = 'none';
+            document.getElementById('order-list').style.display = 'none';
+            document.getElementById('posts-list').style.display = 'none';
+            document.getElementById('about-section').style.display = 'none';
+            document.getElementById('signup-section').style.display = 'none';
+            document.getElementById('upload-section').style.display = 'none';
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section and update nav
+            switch(sectionId) {
+                case 'product-list':
+                    document.getElementById('product-list').style.display = 'grid';
+                    document.getElementById('nav-home').classList.add('active');
+                    fetchProducts();
+                    break;
+                case 'order-list':
+                    document.getElementById('order-list').style.display = 'grid';
+                    document.getElementById('nav-orders').classList.add('active');
+                    fetchOrders();
+                    break;
+                case 'posts-list':
+                    document.getElementById('posts-list').style.display = 'grid';
+                    document.getElementById('upload-section').style.display = 'block';
+                    document.getElementById('nav-posts').classList.add('active');
+                    fetchPosts();
+                    break;
+                case 'about-section':
+                    document.getElementById('about-section').style.display = 'block';
+                    document.getElementById('nav-about').classList.add('active');
+                    break;
+                case 'signup-section':
+                    document.getElementById('signup-section').style.display = 'block';
+                    document.getElementById('nav-signup').classList.add('active');
+                    break;
+            }
         }
 
-        function showAbout() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2>ကျွန်ုပ်တို့အကြောင်း</h2>
-                <p>Email: crakb68@gmail.com</p>
-                <p>Phone: 09983254678</p>
-                <p>Telegram: <a href="https://t.me/OPPERN">t.me/OPPERN</a></p>
-                <p>လိပ်စာ: Yangon No 34, Ayarwade GG 9</p>
-            `;
+        function showSuccessMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
         }
 
-        window.onload = () => {
+        function showErrorMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = message;
+            messageDiv.style.background = 'rgba(239, 71, 111, 0.9)';
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+            
+            // Play error sound
+            playSound('https://assets.mixkit.co/sfx/preview/mixkit-alert-quick-chime-766.mp3');
+        }
+
+        function playSound(url) {
+            const audio = new Audio(url);
+            audio.play();
+        }
+
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the page by showing the products section
             fetchProducts();
-            fetchOrders();
-        };
+            
+            // Show audio player after user interaction
+            document.getElementById('logo').addEventListener('click', function() {
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.style.display = 'block';
+            });
+            
+            // Audio player controls
+            document.getElementById('audio-play').addEventListener('click', function() {
+                const music = document.getElementById('background-music');
+                music.play();
+                document.getElementById('audio-play').style.display = 'none';
+                document.getElementById('audio-pause').style.display = 'inline-block';
+            });
+            
+            document.getElementById('audio-pause').addEventListener('click', function() {
+                const music = document.getElementById('background-music');
+                music.pause();
+                document.getElementById('audio-pause').style.display = 'none';
+                document.getElementById('audio-play').style.display = 'inline-block';
+            });
+            
+            // Navigation
+            document.getElementById('nav-home').addEventListener('click', function() {
+                showSection('product-list');
+            });
+            
+            document.getElementById('nav-orders').addEventListener('click', function() {
+                showSection('order-list');
+            });
+            
+            document.getElementById('nav-posts').addEventListener('click', function() {
+                showSection('posts-list');
+            });
+            
+            document.getElementById('nav-about').addEventListener('click', function() {
+                showSection('about-section');
+            });
+            
+            document.getElementById('nav-signup').addEventListener('click', function() {
+                showSection('signup-section');
+            });
+            
+            // Order Modal
+            document.getElementById('close-order-modal').addEventListener('click', function() {
+                document.getElementById('order-modal').style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('order-modal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('confirm-order-btn').addEventListener('click', placeOrder);
+            
+            // Search functionality
+            document.getElementById('search-btn').addEventListener('click', function() {
+                fetchProducts();
+            });
+            
+            document.getElementById('search-input').addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    fetchProducts();
+                }
+            });
+            
+            // Sign up
+            document.getElementById('signup-btn').addEventListener('click', createUserAccount);
+            
+            // Post creation
+            document.getElementById('post-btn').addEventListener('click', createPost);
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92d02c2b3e03bd34',t:'MTc0NDA5ODYxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
