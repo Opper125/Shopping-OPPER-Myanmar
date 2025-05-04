@@ -4,13 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Shopping OPPER Myanmar</title>
+    
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    
+    <!-- Charts JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Realtime Updates -->
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    
     <style>
+        /* Root Variables */
         :root {
             --primary-color: #4361ee;
+            --primary-dark: #3949ab;
+            --primary-light: #5c7cfa;
             --secondary-color: #3a0ca3;
             --accent-color: #f72585;
             --success-color: #4cc9f0;
@@ -21,10 +31,14 @@
             --gray-color: #6c757d;
             --white-color: #ffffff;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
             --border-radius: 10px;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 5px;
             --transition: all 0.3s ease;
         }
 
+        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -37,9 +51,27 @@
             color: var(--dark-color);
             min-height: 100vh;
             display: flex;
+            line-height: 1.6;
         }
 
-        /* Login section */
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Login Section */
         #login-container {
             width: 100%;
             max-width: 400px;
@@ -47,8 +79,9 @@
             background: white;
             padding: 30px;
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
             text-align: center;
+            animation: fadeIn 0.5s ease;
         }
 
         #login-container h2 {
@@ -59,6 +92,14 @@
 
         .form-group {
             margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-align: left;
+            color: var(--dark-color);
         }
 
         .form-control {
@@ -83,17 +124,23 @@
             font-size: 16px;
             cursor: pointer;
             transition: var(--transition);
-            width: 100%;
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
             background: var(--primary-color);
             color: white;
+            width: 100%;
         }
 
         .btn-primary:hover {
             background: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-danger {
@@ -103,6 +150,8 @@
 
         .btn-danger:hover {
             background: #d63031;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-success {
@@ -112,6 +161,8 @@
 
         .btn-success:hover {
             background: #00a8e8;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-warning {
@@ -121,9 +172,11 @@
 
         .btn-warning:hover {
             background: #ffbc00;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Dashboard section */
+        /* Dashboard Section */
         #admin-container {
             display: none;
             width: 100%;
@@ -137,7 +190,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 250px;
+            width: 280px;
             background: var(--dark-color);
             color: var(--light-color);
             padding: 20px 0;
@@ -145,6 +198,12 @@
             flex-direction: column;
             box-shadow: var(--shadow);
             flex-shrink: 0;
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
         }
 
         .sidebar-header {
@@ -155,8 +214,10 @@
         }
 
         .sidebar-header h2 {
-            font-size: 20px;
-            color: var(--primary-color);
+            font-size: 22px;
+            color: var(--primary-light);
+            margin-top: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .admin-name {
@@ -165,33 +226,47 @@
             color: var(--gray-color);
         }
 
+        .sidebar-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 10px;
+            border: 3px solid var(--primary-color);
+            padding: 5px;
+            background: white;
+        }
+
         .sidebar-menu {
             flex: 1;
         }
 
         .menu-item {
-            padding: 12px 20px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             color: var(--gray-color);
             text-decoration: none;
             transition: var(--transition);
             cursor: pointer;
+            border-left: 4px solid transparent;
         }
 
         .menu-item:hover, .menu-item.active {
             background: rgba(255, 255, 255, 0.1);
             color: var(--light-color);
+            border-left-color: var(--primary-color);
         }
 
         .menu-item i {
-            margin-right: 10px;
+            margin-right: 15px;
             width: 20px;
             text-align: center;
+            font-size: 18px;
         }
 
         .sidebar-footer {
-            padding: 15px 20px;
+            padding: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
         }
@@ -200,6 +275,8 @@
         .main-content {
             flex: 1;
             padding: 20px;
+            margin-left: 280px;
+            width: calc(100% - 280px);
             overflow-y: auto;
         }
 
@@ -207,14 +284,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
         }
 
         .page-title {
-            font-size: 24px;
+            font-size: 28px;
             color: var(--dark-color);
+            font-weight: 700;
         }
 
         /* Dashboard widgets */
@@ -228,22 +306,23 @@
         .stat-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 25px 20px;
             box-shadow: var(--shadow);
             display: flex;
             align-items: center;
             transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
         }
 
         .stat-icon {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
+            border-radius: 12px;
             background: var(--light-color);
             display: flex;
             align-items: center;
@@ -253,7 +332,7 @@
         }
 
         .stat-icon i {
-            font-size: 24px;
+            font-size: 28px;
         }
 
         .stat-info {
@@ -261,15 +340,22 @@
         }
 
         .stat-number {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 5px;
+            color: var(--dark-color);
         }
 
         .stat-text {
             font-size: 14px;
             color: var(--gray-color);
+            font-weight: 500;
         }
+
+        .stat-card:nth-child(1) { border-left-color: var(--primary-color); }
+        .stat-card:nth-child(2) { border-left-color: var(--success-color); }
+        .stat-card:nth-child(3) { border-left-color: var(--warning-color); }
+        .stat-card:nth-child(4) { border-left-color: var(--danger-color); }
 
         .stat-icon.orders-icon { background: rgba(67, 97, 238, 0.1); color: var(--primary-color); }
         .stat-icon.products-icon { background: rgba(76, 201, 240, 0.1); color: var(--success-color); }
@@ -280,25 +366,35 @@
         .charts-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .chart-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 25px;
             box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
         }
 
         .chart-title {
             font-size: 18px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: var(--dark-color);
+            font-weight: 600;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
         }
 
         .chart-container {
             height: 300px;
+            position: relative;
         }
 
         /* Order list */
@@ -307,6 +403,12 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             overflow: hidden;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .order-list:hover {
+            box-shadow: var(--shadow-lg);
         }
 
         .order-list-header {
@@ -318,8 +420,9 @@
         }
 
         .order-list-title {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--dark-color);
+            font-weight: 600;
         }
 
         .order-filter {
@@ -334,6 +437,7 @@
             background: white;
             cursor: pointer;
             transition: var(--transition);
+            font-size: 14px;
         }
 
         .filter-btn:hover, .filter-btn.active {
@@ -355,8 +459,15 @@
 
         .order-table th {
             background: #f8f9fa;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--gray-color);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .order-table tbody tr {
+            transition: var(--transition);
         }
 
         .order-table tbody tr:hover {
@@ -371,7 +482,7 @@
         .product-img {
             width: 40px;
             height: 40px;
-            border-radius: 5px;
+            border-radius: 8px;
             object-fit: cover;
             margin-right: 10px;
         }
@@ -415,6 +526,9 @@
             cursor: pointer;
             font-size: 12px;
             transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .approve-btn {
@@ -457,16 +571,18 @@
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
         }
 
         .product-card-img {
             height: 200px;
             overflow: hidden;
+            position: relative;
         }
 
         .product-card-img img {
@@ -480,20 +596,43 @@
             transform: scale(1.05);
         }
 
+        .sold-out-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--danger-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 10;
+        }
+
         .product-card-body {
             padding: 20px;
         }
 
         .product-card-title {
             font-size: 18px;
-            font-weight: 500;
+            font-weight: 700;
             margin-bottom: 10px;
+            color: var(--dark-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 2.8em;
         }
 
         .product-card-text {
             font-size: 14px;
             color: var(--gray-color);
             margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .product-card-price {
@@ -503,12 +642,92 @@
             margin-bottom: 15px;
         }
 
+        .product-card-date {
+            font-size: 12px;
+            color: var(--gray-color);
+            margin-bottom: 15px;
+        }
+
         .product-card-actions {
             display: flex;
             gap: 10px;
         }
 
-        /* Modal */
+        /* Users section */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .user-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+
+        .user-details {
+            margin-bottom: 15px;
+        }
+
+        .user-detail-item {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .user-detail-label {
+            width: 120px;
+            font-weight: 600;
+            color: var(--gray-color);
+        }
+
+        .user-detail-value {
+            flex: 1;
+        }
+
+        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -520,17 +739,29 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.3s;
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
             background: white;
             border-radius: var(--border-radius);
-            padding: 30px;
-            max-width: 500px;
+            padding: 25px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+            animation: slideDown 0.3s;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
         }
 
         .close-modal {
@@ -541,19 +772,29 @@
             cursor: pointer;
             color: var(--gray-color);
             transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
 
         .close-modal:hover {
             color: var(--danger-color);
+            background: rgba(239, 71, 111, 0.1);
         }
 
-        .modal-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: var(--primary-color);
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
         }
 
-        /* Toast notification */
+        /* Toast notifications */
         .toast {
             position: fixed;
             top: 20px;
@@ -606,24 +847,31 @@
             color: var(--gray-color);
         }
 
-        @media (max-width: 768px) {
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
             .sidebar {
-                width: 70px;
-                overflow: hidden;
+                width: 80px;
+                align-items: center;
             }
 
-            .sidebar-header {
-                padding: 0 10px 10px;
-                margin-bottom: 10px;
-            }
-
-            .sidebar-header h2, .admin-name {
+            .sidebar-header h2, .admin-name, .menu-item span, .sidebar-footer span {
                 display: none;
             }
 
+            .sidebar-logo {
+                width: 50px;
+                height: 50px;
+            }
+
             .menu-item {
-                padding: 15px 0;
                 justify-content: center;
+                padding: 15px;
             }
 
             .menu-item i {
@@ -631,1066 +879,1128 @@
                 font-size: 20px;
             }
 
-            .menu-item span {
-                display: none;
+            .main-content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
             }
+        }
 
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-
+        @media (max-width: 768px) {
             .stats-cards {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .stat-icon i {
+                font-size: 20px;
+            }
+
+            .stat-number {
+                font-size: 20px;
+            }
+
+            .products-grid, .users-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
         }
 
-        /* Order details modal */
-        .order-details {
-            margin-bottom: 20px;
+        @media (max-width: 576px) {
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                width: 100%;
+                height: 60px;
+                flex-direction: row;
+                padding: 0;
+                z-index: 1000;
+            }
+
+            .sidebar-header, .sidebar-footer {
+                display: none;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .menu-item {
+                padding: 10px;
+                border-left: none;
+                border-top: 3px solid transparent;
+            }
+
+            .menu-item.active {
+                border-left-color: transparent;
+                border-top-color: var(--primary-color);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding-bottom: 70px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid, .users-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-list-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .order-table {
+                font-size: 14px;
+            }
+
+            .order-table th, .order-table td {
+                padding: 10px;
+            }
         }
 
-        .order-details h3 {
-            margin-bottom: 15px;
-            color: var(--dark-color);
-        }
-
-        .detail-row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .detail-label {
-            width: 150px;
-            font-weight: 500;
-            color: var(--gray-color);
-        }
-
-        .detail-value {
-            flex: 1;
-        }
-
-        .shipping-address {
-            white-space: pre-line;
-        }
-
-        /* User authentication styles */
-        .login-image {
-            max-width: 100px;
-            margin-bottom: 20px;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--gray-color);
-        }
-
-        .password-field-container {
-            position: relative;
-        }
-
-        .forgot-password {
-            margin-top: 10px;
-            text-align: right;
-        }
-
-        .forgot-password a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        /* Real-time notification badge */
-        .notification-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--danger-color);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        /* Section visibility */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
+        /* Helper classes */
+        .text-center { text-align: center; }
+        .mt-3 { margin-top: 15px; }
+        .mb-3 { margin-bottom: 15px; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 10px; }
     </style>
 </head>
 <body>
-    <!-- Login Section -->
+    <!-- Login Container -->
     <div id="login-container">
-        <img src="https://i.imgur.com/YtCgVQE.png" alt="OPPER Logo" class="login-image">
-        <h2>Admin အကောင့်ဝင်ရန်</h2>
-        <div class="form-group">
-            <input type="email" id="email" class="form-control" placeholder="အီးမေးလ်" required>
-        </div>
-        <div class="form-group password-field-container">
-            <input type="password" id="password" class="form-control" placeholder="စကားဝှက်" required>
-            <span class="password-toggle" id="password-toggle"><i class="fas fa-eye"></i></span>
-        </div>
-        <button onclick="login()" class="btn btn-primary">ဝင်ရန်</button>
-        <div class="forgot-password">
-            <a href="#" id="forgot-password-link">စကားဝှက် မသိလားပါသလား?</a>
-        </div>
+        <img src="https://i.imgur.com/G6cSUx7.png" alt="Shopping OPPER Myanmar Logo" class="sidebar-logo">
+        <h2>အက်ဒမင်ဒက်ရှ်ဘုတ်သို့ ဝင်ရောက်ရန်</h2>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">အသုံးပြုသူအမည်</label>
+                <input type="text" id="username" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">စကားဝှက်</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> ဝင်ရောက်မည်
+            </button>
+        </form>
     </div>
-
-    <!-- Admin Dashboard Section -->
-    <div id="admin-container">
-        <div class="admin-dashboard">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <h2>OPPER Admin</h2>
-                    <div class="admin-name" id="admin-name"></div>
+    
+    <!-- Admin Dashboard Container -->
+    <div id="admin-container" class="admin-dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/opper.png" alt="Shopping OPPER Myanmar Logo" class="sidebar-logo">
+                <h2>Admin Panel</h2>
+                <div class="admin-name">အက်ဒမင်</div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="#dashboard" class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>ဒက်ရှ်ဘုတ်</span>
+                </a>
+                
+                <a href="#orders" class="menu-item" data-page="orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>အော်ဒါများ</span>
+                </a>
+                
+                <a href="#products" class="menu-item" data-page="products">
+                    <i class="fas fa-box-open"></i>
+                    <span>ပစ္စည်းများ</span>
+                </a>
+                
+                <a href="#users" class="menu-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>အသုံးပြုသူများ</span>
+                </a>
+                
+                <a href="#posts" class="menu-item" data-page="posts">
+                    <i class="fas fa-newspaper"></i>
+                    <span>သတင်းများ</span>
+                </a>
+                
+                <a href="#settings" class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>ဆက်တင်များ</span>
+                </a>
+                
+                <a href="upload.html" class="menu-item">
+                    <i class="fas fa-upload"></i>
+                    <span>ပစ္စည်းတင်ရန်</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>ထွက်ခွာမည်</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">ဒက်ရှ်ဘုတ်</h1>
+                    <div class="date-filter">
+                        <button class="filter-btn active">ယနေ့</button>
+                        <button class="filter-btn">ယခုအပတ်</button>
+                        <button class="filter-btn">ယခုလ</button>
+                    </div>
                 </div>
-                <div class="sidebar-menu">
-                    <div class="menu-item active" data-tab="dashboard">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>ဒက်ရှ်ဘုတ်</span>
+                
+                <!-- Stats Cards -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon orders-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="orders-count">0</div>
+                            <div class="stat-text">စုစုပေါင်း အော်ဒါ</div>
+                        </div>
                     </div>
-                    <div class="menu-item" data-tab="orders">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>အော်ဒါများ</span>
-                        <div class="notification-badge" id="order-notification">0</div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon products-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="products-count">0</div>
+                            <div class="stat-text">ပစ္စည်းအရေအတွက်</div>
+                        </div>
                     </div>
-                    <div class="menu-item" data-tab="products">
-                        <i class="fas fa-box"></i>
-                        <span>ပစ္စည်းများ</span>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon users-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="users-count">0</div>
+                            <div class="stat-text">အသုံးပြုသူများ</div>
+                        </div>
                     </div>
-                    <div class="menu-item" data-tab="users">
-                        <i class="fas fa-users"></i>
-                        <span>သုံးစွဲသူများ</span>
-                    </div>
-                    <div class="menu-item" data-tab="settings">
-                        <i class="fas fa-cog"></i>
-                        <span>ဆက်တင်များ</span>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon revenue-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="revenue">0 ကျပ်</div>
+                            <div class="stat-text">စုစုပေါင်းဝင်ငွေ</div>
+                        </div>
                     </div>
                 </div>
-                <div class="sidebar-footer">
-                    <button onclick="logout()" class="btn btn-danger">ထွက်မည်</button>
+                
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3 class="chart-title">ဝင်ငွေအခြေအနေ</h3>
+                        <div class="chart-container">
+                            <canvas id="revenue-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3 class="chart-title">အော်ဒါအခြေအနေ</h3>
+                        <div class="chart-container">
+                            <canvas id="orders-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Orders -->
+                <div class="order-list">
+                    <div class="order-list-header">
+                        <h3 class="order-list-title">နောက်ဆုံးမှာယူထားသော အော်ဒါများ</h3>
+                        <div class="order-filter">
+                            <button class="filter-btn active">အားလုံး</button>
+                            <button class="filter-btn">စစ်ဆေးနေဆဲ</button>
+                            <button class="filter-btn">အတည်ပြု</button>
+                            <button class="filter-btn">ငြင်းပယ်</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-table-container">
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th>အမှတ်စဥ်</th>
+                                    <th>ပစ္စည်း</th>
+                                    <th>ဖောက်သည်</th>
+                                    <th>ငွေပေးချေမှု</th>
+                                    <th>အခြေအနေ</th>
+                                    <th>ရက်စွဲ</th>
+                                    <th>လုပ်ဆောင်ချက်</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-orders">
+                                <!-- Orders will be loaded here via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Dashboard Tab -->
-                <div class="tab-content active" id="dashboard-tab">
-                    <div class="page-header">
-                        <h1 class="page-title">ဒက်ရှ်ဘုတ်</h1>
-                        <div class="date-filter">
-                            <select id="date-range" class="form-control">
-                                <option value="today">ယနေ့</option>
-                                <option value="week">သောပတ်</option>
-                                <option value="month" selected>လတစ်လ</option>
-                                <option value="year">နှစ်တစ်နှစ်</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Stats Cards -->
-                    <div class="stats-cards">
-                        <div class="stat-card">
-                            <div class="stat-icon orders-icon">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-number" id="total-orders">0</div>
-                                <div class="stat-text">အော်ဒါစုစုပေါင်း</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon products-icon">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-number" id="total-products">0</div>
-                                <div class="stat-text">ပစ္စည်းစုစုပေါင်း</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon users-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-number" id="total-users">0</div>
-                                <div class="stat-text">သုံးစွဲသူစုစုပေါင်း</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon revenue-icon">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-number" id="total-revenue">0 MMK</div>
-                                <div class="stat-text">ဝင်ငွေစုစုပေါင်း</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Charts -->
-                    <div class="charts-container">
-                        <div class="chart-card">
-                            <h3 class="chart-title">ဝင်ငွေစာရင်း</h3>
-                            <div class="chart-container">
-                                <canvas id="sales-chart"></canvas>
-                            </div>
-                        </div>
-                        <div class="chart-card">
-                            <h3 class="chart-title">ပစ္စည်းအမျိဳးအစား</h3>
-                            <div class="chart-container">
-                                <canvas id="products-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Orders -->
-                    <div class="order-list">
-                        <div class="order-list-header">
-                            <h3 class="order-list-title">နောက်ဆုံးအော်ဒါများ</h3>
-                            <div class="order-filter">
-                                <button class="filter-btn active" data-filter="all">အားလုံး</button>
-                                <button class="filter-btn" data-filter="pending">ဆိုင်းငံ့</button>
-                                <button class="filter-btn" data-filter="approved">လက်ခံ</button>
-                                <button class="filter-btn" data-filter="rejected">ပယ်ဖျက်</button>
-                            </div>
-                        </div>
-                        <div class="order-table-container">
-                            <table class="order-table">
-                                <thead>
-                                    <tr>
-                                        <th>အမှာစဉ်</th>
-                                        <th>ပစ္စည်း</th>
-                                        <th>အတည်ပြုချိန်</th>
-                                        <th>ငွေလွှဲနည်း</th>
-                                        <th>အခြေအနေ</th>
-                                        <th>လုပ်ဆောင်ချက်</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recent-orders">
-                                    <!-- Orders will be added dynamically -->
-                                </tbody>
-                            </table>
+            
+            <!-- Orders Page -->
+            <div id="orders-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">အော်ဒါများ</h1>
+                    <div class="flex gap-2">
+                        <input type="text" class="form-control" placeholder="အော်ဒါရှာရန်..." id="order-search">
+                        <div class="order-filter">
+                            <button class="filter-btn active">အားလုံး</button>
+                            <button class="filter-btn">စစ်ဆေးနေဆဲ</button>
+                            <button class="filter-btn">အတည်ပြု</button>
+                            <button class="filter-btn">ငြင်းပယ်</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Orders Tab -->
-                <div class="tab-content" id="orders-tab">
-                    <div class="page-header">
-                        <h1 class="page-title">အော်ဒါစီမံခန့်ခွဲခြင်း</h1>
-                        <div class="search-container">
-                            <input type="text" id="order-search" class="form-control" placeholder="ရှာဖွေရန်...">
-                        </div>
-                    </div>
-
-                    <div class="order-list">
-                        <div class="order-list-header">
-                            <h3 class="order-list-title">အော်ဒါများစာရင်း</h3>
-                            <div class="order-filter">
-                                <button class="filter-btn active" data-filter="all">အားလုံး</button>
-                                <button class="filter-btn" data-filter="pending">ဆိုင်းငံ့</button>
-                                <button class="filter-btn" data-filter="approved">လက်ခံ</button>
-                                <button class="filter-btn" data-filter="rejected">ပယ်ဖျက်</button>
-                            </div>
-                        </div>
-                        <div class="order-table-container">
-                            <table class="order-table">
-                                <thead>
-                                    <tr>
-                                        <th>အမှာစဉ်</th>
-                                        <th>ပစ္စည်း</th>
-                                        <th>User ID</th>
-                                        <th>အတည်ပြုချိန်</th>
-                                        <th>ငွေလွှဲနည်း</th>
-                                        <th>အခြေအနေ</th>
-                                        <th>လုပ်ဆောင်ချက်</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="all-orders">
-                                    <!-- Orders will be added dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
+                
+                <div class="order-list">
+                    <div class="order-table-container">
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th>အမှတ်စဥ်</th>
+                                    <th>ပစ္စည်း</th>
+                                    <th>ဖောက်သည်</th>
+                                    <th>ငွေပေးချေမှု</th>
+                                    <th>အခြေအနေ</th>
+                                    <th>ရက်စွဲ</th>
+                                    <th>လုပ်ဆောင်ချက်</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-orders">
+                                <!-- Orders will be loaded here via JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <!-- Products Tab -->
-                <div class="tab-content" id="products-tab">
-                    <div class="page-header">
-                        <h1 class="page-title">ပစ္စည်းစီမံခန့်ခွဲခြင်း</h1>
+            </div>
+            
+            <!-- Products Page -->
+            <div id="products-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">ပစ္စည်းများ</h1>
+                    <div class="flex gap-2">
+                        <input type="text" class="form-control" placeholder="ပစ္စည်းရှာရန်..." id="product-search">
                         <button class="btn btn-primary" id="add-product-btn">
                             <i class="fas fa-plus"></i> ပစ္စည်းအသစ်ထည့်ရန်
                         </button>
                     </div>
-
-                    <div class="products-grid" id="products-grid">
-                        <!-- Products will be added dynamically -->
+                </div>
+                
+                <div class="products-grid" id="products-grid">
+                    <!-- Products will be loaded here via JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Users Page -->
+            <div id="users-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">အသုံးပြုသူများ</h1>
+                    <input type="text" class="form-control" placeholder="အသုံးပြုသူရှာရန်..." id="user-search">
+                </div>
+                
+                <div class="users-grid" id="users-grid">
+                    <!-- Users will be loaded here via JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Posts/News Page -->
+            <div id="posts-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">သတင်းများ</h1>
+                    <div class="flex gap-2">
+                        <input type="text" class="form-control" placeholder="သတင်းရှာရန်..." id="post-search">
+                        <button class="btn btn-primary" id="add-post-btn">
+                            <i class="fas fa-plus"></i> သတင်းအသစ်တင်ရန်
+                        </button>
                     </div>
                 </div>
-
-                <!-- Users Tab -->
-                <div class="tab-content" id="users-tab">
-                    <div class="page-header">
-                        <h1 class="page-title">သုံးစွဲသူများ</h1>
-                        <div class="search-container">
-                            <input type="text" id="user-search" class="form-control" placeholder="ရှာဖွေရန်...">
-                        </div>
-                    </div>
-
-                    <div class="order-list">
-                        <div class="order-table-container">
-                            <table class="order-table">
-                                <thead>
-                                    <tr>
-                                        <th>User ID</th>
-                                        <th>အမှာစဉ်</th>
-                                        <th>အီးမေးလ်</th>
-                                        <th>ပို့လိပ်စာ</th>
-                                        <th>စာရင်းဝင်သည့်ရက်စွဲ</th>
-                                        <th>အော်ဒါအရေအတွက်</th>
-                                        <th>လုပ်ဆောင်ချက်</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="users-list">
-                                    <!-- Users will be added dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                
+                <div class="posts-grid" id="posts-grid">
+                    <!-- Posts will be loaded here via JavaScript -->
                 </div>
-
-                <!-- Settings Tab -->
-                <div class="tab-content" id="settings-tab">
-                    <div class="page-header">
-                        <h1 class="page-title">ဆက်တင်များ</h1>
-                    </div>
-
-                    <div class="settings-container">
-                        <div class="chart-card">
-                            <h3 class="chart-title">အကောင့်ဆက်တင်များ</h3>
-                            <div class="form-group">
-                                <label for="admin-email">အီးမေးလ်</label>
-                                <input type="email" id="admin-email" class="form-control" value="wechatopper@gmail.com" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-name-input">အမည်</label>
-                                <input type="text" id="admin-name-input" class="form-control" placeholder="အမည်ထည့်ပါ">
-                            </div>
-                            <div class="form-group password-field-container">
-                                <label for="current-password">လက်ရှိစကားဝှက်</label>
-                                <input type="password" id="current-password" class="form-control" placeholder="လက်ရှိစကားဝှက်">
-                                <span class="password-toggle"><i class="fas fa-eye"></i></span>
-                            </div>
-                            <div class="form-group password-field-container">
-                                <label for="new-password">စကားဝှက်အသစ်</label>
-                                <input type="password" id="new-password" class="form-control" placeholder="စကားဝှက်အသစ်">
-                                <span class="password-toggle"><i class="fas fa-eye"></i></span>
-                            </div>
-                            <div class="form-group password-field-container">
-                                <label for="confirm-password">စကားဝှက်အသစ်အတည်ပြု</label>
-                                <input type="password" id="confirm-password" class="form-control" placeholder="စကားဝှက်အသစ်အတည်ပြု">
-                                <span class="password-toggle"><i class="fas fa-eye"></i></span>
-                            </div>
-                            <button id="save-settings-btn" class="btn btn-primary">ပြောင်းလဲမှုများသိမ်းမည်</button>
+            </div>
+            
+            <!-- Settings Page -->
+            <div id="settings-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">ဆက်တင်များ</h1>
+                </div>
+                
+                <div class="chart-card">
+                    <h3 class="chart-title">ဆိုင်ဆက်တင်များ</h3>
+                    
+                    <form id="site-settings-form">
+                        <div class="form-group">
+                            <label for="site-name">ဆိုင်အမည်</label>
+                            <input type="text" id="site-name" class="form-control" value="Shopping OPPER Myanmar">
                         </div>
-
-                        <div class="chart-card">
-                            <h3 class="chart-title">စနစ်ဆက်တင်များ</h3>
-                            <div class="form-group">
-                                <label for="store-name">ဆိုင်အမည်</label>
-                                <input type="text" id="store-name" class="form-control" value="Shopping OPPER Myanmar">
-                            </div>
-                            <div class="form-group">
-                                <label for="store-contact">ဆက်သွယ်ရန်ဖုန်းနံပါတ်</label>
-                                <input type="text" id="store-contact" class="form-control" value="09786284670">
-                            </div>
-                            <div class="form-group">
-                                <label for="telegram-contact">တယ်လီဂရမ်အော္ပရေတာ</label>
-                                <input type="text" id="telegram-contact" class="form-control" value="t.me/OPPERN">
-                            </div>
-                            <button id="save-store-settings-btn" class="btn btn-primary">ပြောင်းလဲမှုများသိမ်းမည်</button>
+                        
+                        <div class="form-group">
+                            <label for="site-description">ဆိုင်အကြောင်းအတိုချုပ်</label>
+                            <textarea id="site-description" class="form-control" rows="3">ခေတ်မီဒီဇိုင်းနဲ့ ပစ္စည်းအမျိုးမျိုးကို တိုက်ရိုက်ဝယ်ယူနိုင်တဲ့ နေရာ</textarea>
                         </div>
-                    </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-phone">ဆက်သွယ်ရန်ဖုန်း</label>
+                            <input type="text" id="contact-phone" class="form-control" value="09-786-284-670">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-email">ဆက်သွယ်ရန်အီးမေးလ်</label>
+                            <input type="email" id="contact-email" class="form-control" value="crakb68@gmail.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-address">လိပ်စာ</label>
+                            <textarea id="contact-address" class="form-control" rows="3">အမှတ် 412 Yangon Tharkayta Dawbon Aung သီတာ လမ်း</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> ပြောင်းလဲမှုများကို သိမ်းမည်
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="chart-card mt-3">
+                    <h3 class="chart-title">အက်ဒမင်အကောင့်ဆက်တင်များ</h3>
+                    
+                    <form id="admin-settings-form">
+                        <div class="form-group">
+                            <label for="admin-username">အသုံးပြုသူအမည်</label>
+                            <input type="text" id="admin-username" class="form-control" value="admin">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-email">အီးမေးလ်</label>
+                            <input type="email" id="admin-email" class="form-control" value="crakb68@gmail.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-current-password">လက်ရှိစကားဝှက်</label>
+                            <input type="password" id="admin-current-password" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-new-password">စကားဝှက်အသစ်</label>
+                            <input type="password" id="admin-new-password" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-confirm-password">စကားဝှက်အသစ်အတည်ပြုခြင်း</label>
+                            <input type="password" id="admin-confirm-password" class="form-control">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> ပြောင်းလဲမှုများကို သိမ်းမည်
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-
+    
+    <!-- Modals -->
     <!-- Order Detail Modal -->
-    <div class="modal" id="order-detail-modal">
+    <div id="order-detail-modal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" id="close-order-modal">&times;</span>
+            <span class="close-modal">&times;</span>
             <h2 class="modal-title">အော်ဒါအသေးစိတ်</h2>
             <div id="order-detail-content">
-                <!-- Order details will be populated here -->
+                <!-- Order details will be loaded here via JavaScript -->
             </div>
-            <div id="order-detail-actions" class="action-buttons">
-                <!-- Action buttons will be added here -->
+            <div class="modal-footer">
+                <button class="btn btn-success" id="approve-order-btn">
+                    <i class="fas fa-check"></i> အတည်ပြုမည်
+                </button>
+                <button class="btn btn-danger" id="reject-order-btn">
+                    <i class="fas fa-times"></i> ငြင်းပယ်မည်
+                </button>
+                <button class="btn btn-primary" id="close-order-detail-btn">
+                    <i class="fas fa-times-circle"></i> ပိတ်မည်
+                </button>
             </div>
         </div>
     </div>
-
-    <!-- Add/Edit Product Modal -->
-    <div class="modal" id="product-modal">
+    
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" id="close-product-modal">&times;</span>
+            <span class="close-modal">&times;</span>
             <h2 class="modal-title" id="product-modal-title">ပစ္စည်းအသစ်ထည့်ရန်</h2>
-            <div class="form-group">
-                <label for="product-name">ပစ္စည်းနာမည်</label>
-                <input type="text" id="product-name" class="form-control" placeholder="ပစ္စည်းနာမည်" required>
-            </div>
-            <div class="form-group">
-                <label for="product-description">ပစ္စည်းအကြောင်းအရာ</label>
-                <textarea id="product-description" class="form-control" rows="3" placeholder="ပစ္စည်းအကြောင်းအရာ" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="product-price">တန်ဖိုး (MMK)</label>
-                <input type="number" id="product-price" class="form-control" placeholder="တန်ဖိုး" required>
-            </div>
-            <div class="form-group">
-                <label for="product-image">ပုံရိပ်</label>
-                <input type="file" id="product-image" class="form-control" accept="image/*">
-                <div id="product-image-preview" style="margin-top: 10px;"></div>
-            </div>
-            <div class="form-group">
-                <label for="product-date">ရက်စွဲ</label>
-                <input type="date" id="product-date" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>အခြေအနေ</label>
-                <div>
-                    <input type="checkbox" id="product-status">
-                    <label for="product-status">ရောင်းကုန်ပါပြီ</label>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                
+                <div class="form-group">
+                    <label for="product-name">ပစ္စည်းအမည် <span class="required">*</span></label>
+                    <input type="text" id="product-name" class="form-control" required>
                 </div>
-            </div>
-            <button id="save-product-btn" class="btn btn-primary">သိမ်းမည်</button>
+                
+                <div class="form-group">
+                    <label for="product-description">ပစ္စည်းအကြောင်း <span class="required">*</span></label>
+                    <textarea id="product-description" class="form-control" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-price">စျေးနှုန်း (ကျပ်) <span class="required">*</span></label>
+                    <input type="number" id="product-price" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-image">ပုံလင့်ခ် <span class="required">*</span></label>
+                    <input type="text" id="product-image" class="form-control" required>
+                    <small>ပုံ URL ကို ရိုက်ထည့်ပါ (Imgur, Unsplash စသည်တို့မှ)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>ရောင်းပြီး/ကုန်သွားပြီလား</label>
+                    <div class="flex">
+                        <label style="margin-right: 20px;">
+                            <input type="radio" name="product-sold-out" value="false" checked> မရောင်းရသေးပါ
+                        </label>
+                        <label>
+                            <input type="radio" name="product-sold-out" value="true"> ရောင်းပြီးပါပြီ
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-product-btn">
+                        <i class="fas fa-times"></i> မလုပ်တော့ပါ
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> <span id="product-submit-text">သိမ်းမည်</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <!-- User Detail Modal -->
-    <div class="modal" id="user-detail-modal">
+    
+    <!-- Post Modal -->
+    <div id="post-modal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" id="close-user-modal">&times;</span>
-            <h2 class="modal-title">သုံးစွဲသူအသေးစိတ်</h2>
-            <div id="user-detail-content">
-                <!-- User details will be populated here -->
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title" id="post-modal-title">သတင်းအသစ်တင်ရန်</h2>
+            <form id="post-form">
+                <input type="hidden" id="post-id">
+                
+                <div class="form-group">
+                    <label for="post-title">ခေါင်းစဥ် <span class="required">*</span></label>
+                    <input type="text" id="post-title" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-content">အကြောင်းအရာ <span class="required">*</span></label>
+                    <textarea id="post-content" class="form-control" rows="5" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-image">ပုံလင့်ခ်</label>
+                    <input type="text" id="post-image" class="form-control">
+                    <small>ပုံ URL ကို ရိုက်ထည့်ပါ (Imgur, Unsplash စသည်တို့မှ)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-video">ဗီဒီယိုလင့်ခ်</label>
+                    <input type="text" id="post-video" class="form-control">
+                    <small>YouTube လင့်ခ်ကို https://www.youtube.com/embed/VIDEO_ID ပုံစံဖြင့် ထည့်သွင်းပါ</small>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-post-btn">
+                        <i class="fas fa-times"></i> မလုပ်တော့ပါ
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> <span id="post-submit-text">သိမ်းမည်</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 class="modal-title" id="delete-modal-title">အတည်ပြုခြင်း</h2>
+            <p id="delete-modal-text">ဤပစ္စည်းကို ဖျက်ချင်ပါသလား?</p>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="cancel-delete-btn">
+                    <i class="fas fa-times"></i> မလုပ်တော့ပါ
+                </button>
+                <button class="btn btn-danger" id="confirm-delete-btn">
+                    <i class="fas fa-trash-alt"></i> ဖျက်မည်
+                </button>
             </div>
         </div>
     </div>
-
+    
+    <!-- JavaScript -->
     <script>
-        // Admin credentials
-        const VALID_EMAIL = 'wechatopper@gmail.com';
-        const VALID_PASSWORD = '155872';
-
-        // Pusher configuration
+        // Data stored in memory for demo purposes
+        // In a real app, this would come from the database
+        let orders = [];
+        let products = [];
+        let users = [];
+        let posts = [];
+        let currentOrderId = null;
+        let currentProductId = null;
+        let currentPostId = null;
+        let deleteType = '';
+        let deleteId = null;
+        
+        // Initialize Pusher for real-time updates
         const pusher = new Pusher('8c2540a0c402d0c7aafe', {
             cluster: 'ap1',
             encrypted: true
         });
-        const orderChannel = pusher.subscribe('orders');
+        
+        // Subscribe to different channels for real-time updates
         const productChannel = pusher.subscribe('products');
-
-        // Global variables
-        let allOrders = [];
-        let allProducts = [];
-        let allUsers = [];
-        let pendingOrdersCount = 0;
-        let editingProductId = null;
-
-        // Handle realtime updates
-        orderChannel.bind('newOrder', (data) => {
-            showToast('success', 'အော်ဒါအသစ်', 'အော်ဒါအသစ်တစ်ခုရရှိပါပြီ');
-            pendingOrdersCount++;
-            updateOrderNotification();
-            fetchAllOrders();
-        });
-
-        orderChannel.bind('orderUpdated', () => {
-            fetchAllOrders();
-            updateStats();
-        });
-
-        productChannel.bind('productUpdated', () => {
-            fetchProducts();
-            updateStats();
-        });
-
-        // Authentication functions
-        function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('admin-container').style.display = 'block';
-                document.getElementById('admin-name').textContent = 'Admin';
-                localStorage.setItem('admin_logged_in', 'true');
-                initializeDashboard();
-            } else {
-                showToast('error', 'အော္ပရေတာတာမသင့်ပါ', 'အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါ။');
+        const orderChannel = pusher.subscribe('orders');
+        const postChannel = pusher.subscribe('posts');
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            if (isLoggedIn) {
+                showAdminDashboard();
+                loadAllData();
             }
-        }
-
-        function logout() {
-            document.getElementById('login-container').style.display = 'block';
-            document.getElementById('admin-container').style.display = 'none';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            localStorage.removeItem('admin_logged_in');
-        }
-
-        // Initialize Dashboard
-        function initializeDashboard() {
-            fetchAllOrders();
-            fetchProducts();
-            fetchUsers();
-            updateStats();
-            setupCharts();
             
-            // Set current date in product form
-            const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
-            document.getElementById('product-date').value = formattedDate;
+            // Set up login form
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                // Simple authentication (in a real app, this would be server-side)
+                if (username === 'admin' && password === 'admin123') {
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    showAdminDashboard();
+                    loadAllData();
+                } else {
+                    showToast('အကောင့်ဝင်ရန် မအောင်မြင်ပါ', 'အသုံးပြုသူအမည် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်', 'error');
+                }
+            });
+            
+            // Set up logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('adminLoggedIn');
+                showLoginForm();
+            });
+            
+            // Set up navigation
+            document.querySelectorAll('.sidebar .menu-item[data-page]').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+            
+            // Set up order search
+            document.getElementById('order-search').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterOrders(query);
+            });
+            
+            // Set up product search
+            document.getElementById('product-search').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterProducts(query);
+            });
+            
+            // Set up user search
+            document.getElementById('user-search').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterUsers(query);
+            });
+            
+            // Set up post search
+            document.getElementById('post-search').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterPosts(query);
+            });
+            
+            // Set up add product button
+            document.getElementById('add-product-btn').addEventListener('click', function() {
+                openProductModal();
+            });
+            
+            // Set up product form
+            document.getElementById('product-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProduct();
+            });
+            
+            // Set up cancel product button
+            document.getElementById('cancel-product-btn').addEventListener('click', function() {
+                closeProductModal();
+            });
+            
+            // Set up product modal close button
+            document.querySelector('#product-modal .close-modal').addEventListener('click', function() {
+                closeProductModal();
+            });
+            
+            // Set up add post button
+            document.getElementById('add-post-btn').addEventListener('click', function() {
+                openPostModal();
+            });
+            
+            // Set up post form
+            document.getElementById('post-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                savePost();
+            });
+            
+            // Set up cancel post button
+            document.getElementById('cancel-post-btn').addEventListener('click', function() {
+                closePostModal();
+            });
+            
+            // Set up post modal close button
+            document.querySelector('#post-modal .close-modal').addEventListener('click', function() {
+                closePostModal();
+            });
+            
+            // Set up order detail modal close buttons
+            document.querySelector('#order-detail-modal .close-modal').addEventListener('click', function() {
+                closeOrderDetailModal();
+            });
+            
+            document.getElementById('close-order-detail-btn').addEventListener('click', function() {
+                closeOrderDetailModal();
+            });
+            
+            // Set up approve and reject order buttons
+            document.getElementById('approve-order-btn').addEventListener('click', function() {
+                updateOrderStatus('အတည်ပြု');
+            });
+            
+            document.getElementById('reject-order-btn').addEventListener('click', function() {
+                updateOrderStatus('ငြင်းပယ်');
+            });
+            
+            // Set up delete modal buttons
+            document.getElementById('cancel-delete-btn').addEventListener('click', function() {
+                closeDeleteModal();
+            });
+            
+            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+                confirmDelete();
+            });
+            
+            // Set up site settings form
+            document.getElementById('site-settings-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveSiteSettings();
+            });
+            
+            // Set up admin settings form
+            document.getElementById('admin-settings-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveAdminSettings();
+            });
+            
+            // Set up real-time updates
+            productChannel.bind('productUpdated', function() {
+                loadProducts();
+                updateDashboardStats();
+            });
+            
+            orderChannel.bind('orderUpdated', function() {
+                loadOrders();
+                updateDashboardStats();
+            });
+            
+            orderChannel.bind('newOrder', function() {
+                loadOrders();
+                updateDashboardStats();
+                showToast('အော်ဒါအသစ်ရရှိခဲ့သည်', 'အော်ဒါအသစ်တစ်ခု ရရှိခဲ့ပါသည်။', 'success');
+            });
+            
+            postChannel.bind('postUpdated', function() {
+                loadPosts();
+            });
+        });
+        
+        // Show admin dashboard
+        function showAdminDashboard() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-container').style.display = 'block';
+            showPage('dashboard');
         }
-
-        // Data Fetching Functions
-        async function fetchAllOrders() {
+        
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('admin-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('login-form').reset();
+        }
+        
+        // Show specific page
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show the selected page
+            document.getElementById(`${pageId}-page`).classList.remove('hidden');
+            
+            // Update active menu item
+            document.querySelectorAll('.sidebar .menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelector(`.sidebar .menu-item[data-page="${pageId}"]`).classList.add('active');
+        }
+        
+        // Load all data
+        async function loadAllData() {
+            loadOrders();
+            loadProducts();
+            loadUsers();
+            loadPosts();
+            updateDashboardStats();
+            initializeCharts();
+        }
+        
+        // Load orders from API
+        async function loadOrders() {
             try {
                 const response = await fetch('/.netlify/functions/data?action=getOrders');
-                if (!response.ok) throw new Error('Failed to fetch orders');
-                allOrders = await response.json();
-                displayOrders(allOrders, 'all-orders');
-                displayRecentOrders(allOrders);
-                updateStats();
+                orders = await response.json();
+                renderOrders();
+                renderRecentOrders();
             } catch (error) {
-                console.error('Error fetching orders:', error);
-                showToast('error', 'အမှားဖြစ်ပြီ', 'အော်ဒါများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                console.error('Error loading orders:', error);
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'အော်ဒါများ ရယူရာတွင် အမှားရှိနေပါသည်', 'error');
             }
         }
-
-        async function fetchProducts() {
+        
+        // Load products from API
+        async function loadProducts() {
             try {
                 const response = await fetch('/.netlify/functions/data?action=getProducts');
-                if (!response.ok) throw new Error('Failed to fetch products');
-                allProducts = await response.json();
-                displayProducts(allProducts);
-                updateStats();
+                products = await response.json();
+                renderProducts();
             } catch (error) {
-                console.error('Error fetching products:', error);
-                showToast('error', 'အမှားဖြစ်ပြီ', 'ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                console.error('Error loading products:', error);
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'ပစ္စည်းများ ရယူရာတွင် အမှားရှိနေပါသည်', 'error');
             }
         }
-
-        async function fetchUsers() {
-            // For this example, we will use simulated user data
-            // In a real app, you would fetch this from your database
-            allUsers = generateSampleUsers(10);
-            displayUsers(allUsers);
-            updateStats();
+        
+        // Load users from API
+        async function loadUsers() {
+            try {
+                const response = await fetch('/.netlify/functions/data?action=getUsers');
+                users = await response.json() || [];
+                renderUsers();
+            } catch (error) {
+                console.error('Error loading users:', error);
+                // Create dummy users for demo
+                users = [
+                    { id: 'user1', name: 'မောင်မောင်', email: 'mgmg@example.com', phone: '09-111-222-333', address: 'ရန်ကုန်' },
+                    { id: 'user2', name: 'စန်းစန်း', email: 'sansanwin@example.com', phone: '09-444-555-666', address: 'မန္တလေး' },
+                    { id: 'user3', name: 'အေးအေး', email: 'ayeaye@example.com', phone: '09-777-888-999', address: 'နေပြည်တော်' }
+                ];
+                renderUsers();
+            }
         }
-
-        // Display Functions
-        function displayOrders(orders, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
+        
+        // Load posts from API
+        async function loadPosts() {
+            try {
+                const response = await fetch('/.netlify/functions/data?action=getPosts');
+                posts = await response.json();
+                renderPosts();
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'သတင်းများ ရယူရာတွင် အမှားရှိနေပါသည်', 'error');
+            }
+        }
+        
+        // Render orders
+        function renderOrders() {
+            const ordersContainer = document.getElementById('all-orders');
+            ordersContainer.innerHTML = '';
             
             if (orders.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" style="text-align: center;">No orders found</td></tr>`;
+                ordersContainer.innerHTML = `<tr><td colspan="7" class="text-center">အော်ဒါများ မရှိသေးပါ</td></tr>`;
                 return;
             }
             
-            orders.forEach(order => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${order.id.substring(0, 6)}</td>
-                    <td>
-                        <div class="order-product">
-                            <img src="${order.productImage}" alt="${order.productName}" class="product-img">
-                            <span class="product-name">${order.productName}</span>
-                        </div>
-                    </td>
-                    ${containerId === 'all-orders' ? `<td>${order.userId}</td>` : ''}
-                    <td>${new Date(order.orderTime).toLocaleString()}</td>
-                    <td>${order.paymentMethod} - ${order.transactionId}</td>
-                    <td>
-                        <span class="status-badge ${order.status === 'ဆိုင်းငံ့' ? 'status-pending' : order.status === 'အတည်ပြု' ? 'status-approved' : 'status-rejected'}">
-                            ${order.status}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn view-btn" onclick="viewOrderDetails('${order.id}')"><i class="fas fa-eye"></i></button>
-                            ${order.status === 'ဆိုင်းငံ့' ? `
-                                <button class="action-btn approve-btn" onclick="updateOrderStatus('${order.id}', 'အတည်ပြု', '${order.productId}', '${order.userId}')"><i class="fas fa-check"></i></button>
-                                <button class="action-btn reject-btn" onclick="updateOrderStatus('${order.id}', 'ပယ်ဖျက်', null, '${order.userId}')"><i class="fas fa-times"></i></button>
-                            ` : ''}
-                        </div>
-                    </td>
+            orders.forEach((order, index) => {
+                const statusBadge = getStatusBadge(order.status);
+                
+                ordersContainer.innerHTML += `
+                    <tr>
+                        <td>${order.id.substring(0, 8)}</td>
+                        <td>
+                            <div class="order-product">
+                                <img src="${order.product_image || 'https://via.placeholder.com/40'}" alt="${order.product_name}" class="product-img">
+                                <span class="product-name">${order.product_name}</span>
+                            </div>
+                        </td>
+                        <td>${order.telegram_username}</td>
+                        <td>${order.payment_method}</td>
+                        <td>${statusBadge}</td>
+                        <td>${formatDate(order.order_time)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn view-btn" onclick="openOrderDetailModal('${order.id}')">
+                                    <i class="fas fa-eye"></i> ကြည့်ရှုရန်
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                 `;
-                container.appendChild(row);
             });
         }
-
-        function displayRecentOrders(orders) {
-            // Sort by date descending
-            const recentOrders = [...orders].sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime)).slice(0, 5);
-            displayOrders(recentOrders, 'recent-orders');
+        
+        // Render recent orders
+        function renderRecentOrders() {
+            const recentOrdersContainer = document.getElementById('recent-orders');
+            recentOrdersContainer.innerHTML = '';
+            
+            if (orders.length === 0) {
+                recentOrdersContainer.innerHTML = `<tr><td colspan="7" class="text-center">အော်ဒါများ မရှိသေးပါ</td></tr>`;
+                return;
+            }
+            
+            // Get 5 most recent orders
+            const recentOrders = [...orders]
+                .sort((a, b) => new Date(b.order_time) - new Date(a.order_time))
+                .slice(0, 5);
+            
+            recentOrders.forEach((order, index) => {
+                const statusBadge = getStatusBadge(order.status);
+                
+                recentOrdersContainer.innerHTML += `
+                    <tr>
+                        <td>${order.id.substring(0, 8)}</td>
+                        <td>
+                            <div class="order-product">
+                                <img src="${order.product_image || 'https://via.placeholder.com/40'}" alt="${order.product_name}" class="product-img">
+                                <span class="product-name">${order.product_name}</span>
+                            </div>
+                        </td>
+                        <td>${order.telegram_username}</td>
+                        <td>${order.payment_method}</td>
+                        <td>${statusBadge}</td>
+                        <td>${formatDate(order.order_time)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn view-btn" onclick="openOrderDetailModal('${order.id}')">
+                                    <i class="fas fa-eye"></i> ကြည့်ရှုရန်
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
         }
-
-        function displayProducts(products) {
-            const container = document.getElementById('products-grid');
-            container.innerHTML = '';
+        
+        // Render products
+        function renderProducts() {
+            const productsGrid = document.getElementById('products-grid');
+            productsGrid.innerHTML = '';
             
             if (products.length === 0) {
-                container.innerHTML = `<div class="no-products">No products found</div>`;
+                productsGrid.innerHTML = `<div class="text-center">ပစ္စည်းများ မရှိသေးပါ</div>`;
                 return;
             }
             
             products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <div class="product-card-img">
-                        ${product.soldOut ? '<img src="https://i.imgur.com/zEA9t8M.png" style="position:absolute;width:150px;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;" alt="Sold Out">' : ''}
-                        <img src="${product.image}" alt="${product.name}">
-                    </div>
-                    <div class="product-card-body">
-                        <h3 class="product-card-title">${product.name}</h3>
-                        <p class="product-card-text">${product.description}</p>
-                        <div class="product-card-price">${Number(product.price).toLocaleString()} MMK</div>
-                        <div class="product-card-actions">
-                            <button class="btn btn-primary" onclick="editProduct('${product.id}')"><i class="fas fa-edit"></i> ပြင်ဆင်</button>
-                            <button class="btn btn-danger" onclick="deleteProduct('${product.id}')"><i class="fas fa-trash"></i> ဖျက်</button>
+                const soldOutBadge = product.sold_out ? 
+                    `<div class="sold-out-badge">ရောင်းပြီး</div>` : '';
+                
+                productsGrid.innerHTML += `
+                    <div class="product-card">
+                        <div class="product-card-img">
+                            ${soldOutBadge}
+                            <img src="${product.image || 'https://via.placeholder.com/300'}" alt="${product.name}">
+                        </div>
+                        <div class="product-card-body">
+                            <h3 class="product-card-title">${product.name}</h3>
+                            <p class="product-card-text">${product.description}</p>
+                            <div class="product-card-price">${formatPrice(product.price)}</div>
+                            <div class="product-card-date">${formatDate(product.date || product.created_at)}</div>
+                            <div class="product-card-actions">
+                                <button class="btn btn-primary" onclick="openProductModal('${product.id}')">
+                                    <i class="fas fa-edit"></i> ပြင်ဆင်ရန်
+                                </button>
+                                <button class="btn btn-danger" onclick="openDeleteModal('product', '${product.id}')">
+                                    <i class="fas fa-trash-alt"></i> ဖျက်ရန်
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
-                container.appendChild(productCard);
             });
         }
-
-        function displayUsers(users) {
-            const container = document.getElementById('users-list');
-            container.innerHTML = '';
+        
+        // Render users
+        function renderUsers() {
+            const usersGrid = document.getElementById('users-grid');
+            usersGrid.innerHTML = '';
             
             if (users.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" style="text-align: center;">No users found</td></tr>`;
+                usersGrid.innerHTML = `<div class="text-center">အသုံးပြုသူများ မရှိသေးပါ</div>`;
                 return;
             }
             
             users.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${user.id}</td>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.address || '-'}</td>
-                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                    <td>${user.orderCount}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn view-btn" onclick="viewUserDetails('${user.id}')"><i class="fas fa-eye"></i></button>
+                const initials = getInitials(user.name);
+                
+                usersGrid.innerHTML += `
+                    <div class="user-card">
+                        <div class="user-card-header">
+                            <div class="user-avatar">${initials}</div>
+                            <div class="user-info">
+                                <h3>${user.name}</h3>
+                                <p>${user.email}</p>
+                            </div>
                         </div>
-                    </td>
+                        <div class="user-details">
+                            <div class="user-detail-item">
+                                <div class="user-detail-label">ဖုန်းနံပါတ်</div>
+                                <div class="user-detail-value">${user.phone || 'မရှိပါ'}</div>
+                            </div>
+                            <div class="user-detail-item">
+                                <div class="user-detail-label">လိပ်စာ</div>
+                                <div class="user-detail-value">${user.address || 'မရှိပါ'}</div>
+                            </div>
+                            <div class="user-detail-item">
+                                <div class="user-detail-label">အော်ဒါများ</div>
+                                <div class="user-detail-value">${getUserOrderCount(user.id)} ခု</div>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                container.appendChild(row);
             });
         }
-
-        // Update Stats
-        function updateStats() {
-            // Calculate stats
-            const totalOrders = allOrders.length;
-            const totalProducts = allProducts.length;
-            const totalUsers = allUsers.length;
-            const pendingOrders = allOrders.filter(order => order.status === 'ဆိုင်းငံ့').length;
+        
+        // Render posts
+        function renderPosts() {
+            const postsGrid = document.getElementById('posts-grid');
+            postsGrid.innerHTML = '';
             
-            // Update pending orders notification
-            pendingOrdersCount = pendingOrders;
-            updateOrderNotification();
-            
-            // Calculate revenue from approved orders
-            const revenue = allOrders
-                .filter(order => order.status === 'အတည်ပြု')
-                .reduce((total, order) => {
-                    // Find the product to get its price
-                    const product = allProducts.find(p => p.id === order.productId);
-                    return total + (product ? Number(product.price) : 0);
-                }, 0);
-            
-            // Update dashboard stats
-            document.getElementById('total-orders').textContent = totalOrders;
-            document.getElementById('total-products').textContent = totalProducts;
-            document.getElementById('total-users').textContent = totalUsers;
-            document.getElementById('total-revenue').textContent = `${revenue.toLocaleString()} MMK`;
-            
-            // Update charts if they've been initialized
-            if (window.salesChart && window.productsChart) {
-                updateCharts();
-            }
-        }
-
-        function updateOrderNotification() {
-            const badge = document.getElementById('order-notification');
-            badge.textContent = pendingOrdersCount;
-            badge.style.display = pendingOrdersCount > 0 ? 'flex' : 'none';
-        }
-
-        // Order Actions
-        function viewOrderDetails(orderId) {
-            const order = allOrders.find(o => o.id === orderId);
-            if (!order) return;
-            
-            const modalContent = document.getElementById('order-detail-content');
-            modalContent.innerHTML = `
-                <div class="order-details">
-                    <h3>ပစ္စည်းအချက်အလက်</h3>
-                    <div class="detail-row">
-                        <div class="detail-label">ပစ္စည်းနာမည်</div>
-                        <div class="detail-value">${order.productName}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">ပစ္စည်း ID</div>
-                        <div class="detail-value">${order.productId}</div>
-                    </div>
-                    
-                    <h3>မှာယူသူအချက်အလက်</h3>
-                    <div class="detail-row">
-                        <div class="detail-label">User ID</div>
-                        <div class="detail-value">${order.userId}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Telegram</div>
-                        <div class="detail-value">@${order.telegramUsername}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">ပို့ဆောင်ရန်လိပ်စာ</div>
-                        <div class="detail-value shipping-address">${order.shippingAddress || 'Not provided'}</div>
-                    </div>
-                    
-                    <h3>ငွေပေးချေမှု</h3>
-                    <div class="detail-row">
-                        <div class="detail-label">ငွေလွှဲနည်း</div>
-                        <div class="detail-value">${order.paymentMethod}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">ငွေလွှဲနံပါတ်</div>
-                        <div class="detail-value">${order.transactionId}</div>
-                    </div>
-                    
-                    <h3>အခြေအနေ</h3>
-                    <div class="detail-row">
-                        <div class="detail-label">အတည်ပြုချိန်</div>
-                        <div class="detail-value">${new Date(order.orderTime).toLocaleString()}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">အခြေအနေ</div>
-                        <div class="detail-value">
-                            <span class="status-badge ${order.status === 'ဆိုင်းငံ့' ? 'status-pending' : order.status === 'အတည်ပြု' ? 'status-approved' : 'status-rejected'}">
-                                ${order.status}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            const actionsContainer = document.getElementById('order-detail-actions');
-            if (order.status === 'ဆိုင်းငံ့') {
-                actionsContainer.innerHTML = `
-                    <button class="btn btn-success" onclick="updateOrderStatus('${order.id}', 'အတည်ပြု', '${order.productId}', '${order.userId}')"><i class="fas fa-check"></i> လက်ခံမည်</button>
-                    <button class="btn btn-danger" onclick="updateOrderStatus('${order.id}', 'ပယ်ဖျက်', null, '${order.userId}')"><i class="fas fa-times"></i> ပယ်ဖျက်မည်</button>
-                `;
-            } else {
-                actionsContainer.innerHTML = '';
-            }
-            
-            document.getElementById('order-detail-modal').style.display = 'flex';
-        }
-
-        async function updateOrderStatus(id, status, productId, userId) {
-            try {
-                const response = await fetch('/.netlify/functions/data', {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'updateOrder', id, status, productId, userId })
-                });
-                
-                if (response.ok) {
-                    showToast('success', 'အောင်မြင်ပါပြီ', `အော်ဒါအခြေအနေကို ${status} သို့ ပြောင်းလဲပြီး`);
-                    fetchAllOrders();
-                    fetchProducts();
-                    if (document.getElementById('order-detail-modal').style.display === 'flex') {
-                        document.getElementById('order-detail-modal').style.display = 'none';
-                    }
-                } else {
-                    throw new Error('Failed to update order status');
-                }
-            } catch (error) {
-                console.error('Error updating order:', error);
-                showToast('error', 'အမှားဖြစ်ပြီ', 'အော်ဒါပြင်ရာတွင် အမှားဖြစ်ပါသည်။');
-            }
-        }
-
-        // Product Actions
-        function editProduct(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
-            
-            // Set editing state
-            editingProductId = productId;
-            
-            // Fill the form
-            document.getElementById('product-modal-title').textContent = 'ပစ္စည်းပြင်ဆင်ရန်';
-            document.getElementById('product-name').value = product.name;
-            document.getElementById('product-description').value = product.description;
-            document.getElementById('product-price').value = product.price;
-            document.getElementById('product-date').value = product.date;
-            document.getElementById('product-status').checked = product.soldOut;
-            
-            // Show image preview
-            const imagePreview = document.getElementById('product-image-preview');
-            imagePreview.innerHTML = `<img src="${product.image}" alt="${product.name}" style="max-width: 100%; max-height: 200px; margin-top: 10px;">`;
-            
-            // Show modal
-            document.getElementById('product-modal').style.display = 'flex';
-        }
-
-        async function deleteProduct(productId) {
-            if (confirm('ဤပစ္စည်းကို သေချာစွာ ဖျက်လိုပါသလား?')) {
-                try {
-                    const response = await fetch('/.netlify/functions/data', {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'deleteProduct', id: productId })
-                    });
-                    
-                    if (response.ok) {
-                        showToast('success', 'အောင်မြင်ပါပြီ', 'ပစ္စည်းဖျက်ခြင်း အောင်မြင်ပါပြီ');
-                        fetchProducts();
-                        updateStats();
-                    } else {
-                        throw new Error('Failed to delete product');
-                    }
-                } catch (error) {
-                    console.error('Error deleting product:', error);
-                    showToast('error', 'အမှားဖြစ်ပြီ', 'ပစ္စည်းဖျက်ရာတွင် အမှားဖြစ်ပါသည်။');
-                }
-            }
-        }
-
-        async function saveProduct() {
-            const name = document.getElementById('product-name').value;
-            const description = document.getElementById('product-description').value;
-            const price = document.getElementById('product-price').value;
-            const date = document.getElementById('product-date').value;
-            const soldOut = document.getElementById('product-status').checked;
-            const imageInput = document.getElementById('product-image');
-            
-            if (!name || !description || !price || !date) {
-                showToast('error', 'အမှားဖြစ်ပြီ', 'အကွက်အားလုံး ဖြည့်ပါ');
+            if (posts.length === 0) {
+                postsGrid.innerHTML = `<div class="text-center">သတင်းများ မရှိသေးပါ</div>`;
                 return;
             }
             
-            try {
-                let imageUrl;
-                
-                // If editing and no new image is selected, use the existing image
-                if (editingProductId && !imageInput.files[0]) {
-                    const existingProduct = allProducts.find(p => p.id === editingProductId);
-                    imageUrl = existingProduct?.image;
-                } else if (imageInput.files[0]) {
-                    // Upload new image
-                    imageUrl = await uploadImage(imageInput.files[0]);
-                } else {
-                    showToast('error', 'အမှားဖြစ်ပြီ', 'ပုံရိပ်ထည့်ပါ');
-                    return;
-                }
-                
-                if (!imageUrl) {
-                    showToast('error', 'အမှားဖြစ်ပြီ', 'ပုံရိပ်အပ်လုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
-                    return;
-                }
-                
-                // Prepare product data
-                const productData = {
-                    action: editingProductId ? 'updateProduct' : 'uploadProduct',
-                    id: editingProductId || Date.now().toString(),
-                    name,
-                    description,
-                    price,
-                    date,
-                    image: imageUrl,
-                    soldOut,
-                    phone: '09786284670'
-                };
-                
-                // Send to server
-                const response = await fetch('/.netlify/functions/data', {
-                    method: 'POST',
-                    body: JSON.stringify(productData)
-                });
-                
-                if (response.ok) {
-                    showToast('success', 'အောင်မြင်ပါပြီ', editingProductId ? 'ပစ္စည်းပြင်ဆင်ခြင်း အောင်မြင်ပါပြီ' : 'ပစ္စည်းအသစ်ထည့်ခြင်း အောင်မြင်ပါပြီ');
-                    resetProductForm();
-                    document.getElementById('product-modal').style.display = 'none';
-                    fetchProducts();
-                } else {
-                    throw new Error('Failed to save product');
-                }
-            } catch (error) {
-                console.error('Error saving product:', error);
-                showToast('error', 'အမှားဖြစ်ပြီ', 'ပစ္စည်းသိမ်းရာတွင် အမှားဖြစ်ပါသည်။');
-            }
+            posts.forEach(post => {
+                postsGrid.innerHTML += `
+                    <div class="product-card">
+                        ${post.image ? `
+                            <div class="product-card-img">
+                                <img src="${post.image}" alt="${post.title}">
+                            </div>
+                        ` : ''}
+                        <div class="product-card-body">
+                            <h3 class="product-card-title">${post.title}</h3>
+                            <p class="product-card-text">${post.content}</p>
+                            <div class="product-card-date">${formatDate(post.date)}</div>
+                            <div class="product-card-actions">
+                                <button class="btn btn-primary" onclick="openPostModal('${post.id}')">
+                                    <i class="fas fa-edit"></i> ပြင်ဆင်ရန်
+                                </button>
+                                <button class="btn btn-danger" onclick="openDeleteModal('post', '${post.id}')">
+                                    <i class="fas fa-trash-alt"></i> ဖျက်ရန်
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
         }
-
-        function resetProductForm() {
-            document.getElementById('product-name').value = '';
-            document.getElementById('product-description').value = '';
-            document.getElementById('product-price').value = '';
-            document.getElementById('product-image').value = '';
-            document.getElementById('product-status').checked = false;
-            document.getElementById('product-image-preview').innerHTML = '';
-            editingProductId = null;
-        }
-
-        async function uploadImage(file) {
-            const formData = new FormData();
-            formData.append('image', file);
+        
+        // Update dashboard stats
+        function updateDashboardStats() {
+            // Update order count
+            document.getElementById('orders-count').textContent = orders.length;
             
-            try {
-                const response = await fetch('https://api.imgur.com/3/image', {
-                    method: 'POST',
-                    headers: { Authorization: 'Client-ID be0d52c6d1693d0' },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    return data.data.link;
-                } else {
-                    console.error('Imgur Error:', data);
-                    return null;
+            // Update product count
+            document.getElementById('products-count').textContent = products.length;
+            
+            // Update user count
+            document.getElementById('users-count').textContent = users.length;
+            
+            // Calculate total revenue
+            let totalRevenue = 0;
+            orders.forEach(order => {
+                // Only count approved orders
+                if (order.status === 'အတည်ပြု') {
+                    const product = products.find(p => p.id === order.product_id);
+                    if (product) {
+                        totalRevenue += Number(product.price);
+                    }
                 }
-            } catch (error) {
-                console.error('Upload Error:', error);
-                return null;
-            }
+            });
+            
+            document.getElementById('revenue').textContent = formatPrice(totalRevenue);
         }
-
-        // User Actions
-        function viewUserDetails(userId) {
-            const user = allUsers.find(u => u.id === userId);
-            if (!user) return;
-            
-            // Get user's orders
-            const userOrders = allOrders.filter(o => o.userId === userId);
-            
-            const modalContent = document.getElementById('user-detail-content');
-            modalContent.innerHTML = `
-                <div class="order-details">
-                    <h3>သုံးစွဲသူအချက်အလက်</h3>
-                    <div class="detail-row">
-                        <div class="detail-label">User ID</div>
-                        <div class="detail-value">${user.id}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">အမည်</div>
-                        <div class="detail-value">${user.name}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">အီးမေးလ်</div>
-                        <div class="detail-value">${user.email}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">ဖုန်းနံပါတ်</div>
-                        <div class="detail-value">${user.phone || '-'}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">လိပ်စာ</div>
-                        <div class="detail-value">${user.address || '-'}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">စာရင်းဝင်သည့်ရက်စွဲ</div>
-                        <div class="detail-value">${new Date(user.createdAt).toLocaleString()}</div>
-                    </div>
-                </div>
-                
-                <div class="order-details">
-                    <h3>မှာယူခဲ့သောအော်ဒါများ (${userOrders.length})</h3>
-                    ${userOrders.length > 0 ? `
-                        <table class="order-table">
-                            <thead>
-                                <tr>
-                                    <th>အမှာစဉ်</th>
-                                    <th>ပစ္စည်း</th>
-                                    <th>အတည်ပြုချိန်</th>
-                                    <th>အခြေအနေ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${userOrders.map(order => `
-                                    <tr>
-                                        <td>${order.id.substring(0, 6)}</td>
-                                        <td>
-                                            <div class="order-product">
-                                                <img src="${order.productImage}" alt="${order.productName}" class="product-img">
-                                                <span class="product-name">${order.productName}</span>
-                                            </div>
-                                        </td>
-                                        <td>${new Date(order.orderTime).toLocaleString()}</td>
-                                        <td>
-                                            <span class="status-badge ${order.status === 'ဆိုင်းငံ့' ? 'status-pending' : order.status === 'အတည်ပြု' ? 'status-approved' : 'status-rejected'}">
-                                                ${order.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    ` : '<p>ဤသုံးစွဲသူတွင် မှာယူခဲ့သောအော်ဒါမရှိသေးပါ</p>'}
-                </div>
-            `;
-            
-            document.getElementById('user-detail-modal').style.display = 'flex';
-        }
-
-        // Charts
-        function setupCharts() {
-            // Sales Chart
-            const salesCtx = document.getElementById('sales-chart').getContext('2d');
-            window.salesChart = new Chart(salesCtx, {
+        
+        // Initialize charts
+        function initializeCharts() {
+            // Setup revenue chart
+            const revenueCtx = document.getElementById('revenue-chart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: ['ဇန်နဝါရီ', 'ဖေဖော်ဝါရီ', 'မတ်', 'ဧပြီ', 'မေ', 'ဇွန်', 'ဇူလိုင်', 'သြဂုတ်', 'စက်တင်ဘာ', 'အောက်တိုဘာ', 'နိုဝင်ဘာ', 'ဒီဇင်ဘာ'],
                     datasets: [{
-                        label: 'ဝင်ငွေ',
-                        data: [],
-                        backgroundColor: 'rgba(67, 97, 238, 0.2)',
-                        borderColor: 'rgba(67, 97, 238, 1)',
+                        label: 'ဝင်ငွေ (ကျပ်သိန်းပေါင်း)',
+                        data: [15, 23, 27, 42, 38, 50, 65, 72, 78, 85, 93, 105],
+                        backgroundColor: 'rgba(76, 201, 240, 0.2)',
+                        borderColor: 'rgba(76, 201, 240, 1)',
                         borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
+                        pointBackgroundColor: 'rgba(76, 201, 240, 1)',
+                        tension: 0.3
                     }]
                 },
                 options: {
@@ -1699,32 +2009,40 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString() + ' MMK';
-                                }
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
             });
             
-            // Products Chart
-            const productsCtx = document.getElementById('products-chart').getContext('2d');
-            window.productsChart = new Chart(productsCtx, {
-                type: 'doughnut',
+            // Setup orders chart
+            const ordersCtx = document.getElementById('orders-chart').getContext('2d');
+            const ordersChart = new Chart(ordersCtx, {
+                type: 'pie',
                 data: {
-                    labels: ['ရောင်းပြီး', 'ရောင်းပြီးအရေအတွက်', 'ရောင်းကုန်'],
+                    labels: ['စစ်ဆေးနေဆဲ', 'အတည်ပြု', 'ငြင်းပယ်'],
                     datasets: [{
-                        label: 'ပစ္စည်းအရေအတွက်',
-                        data: [0, 0, 0],
+                        data: [30, 50, 20],
                         backgroundColor: [
-                            'rgba(67, 97, 238, 0.7)',
-                            'rgba(76, 201, 240, 0.7)',
-                            'rgba(239, 71, 111, 0.7)'
+                            'rgba(255, 209, 102, 0.8)',
+                            'rgba(76, 201, 240, 0.8)',
+                            'rgba(239, 71, 111, 0.8)'
                         ],
                         borderColor: [
-                            'rgba(67, 97, 238, 1)',
+                            'rgba(255, 209, 102, 1)',
                             'rgba(76, 201, 240, 1)',
                             'rgba(239, 71, 111, 1)'
                         ],
@@ -1741,345 +2059,580 @@
                     }
                 }
             });
-            
-            updateCharts();
         }
-
-        function updateCharts() {
-            // Get date range selection
-            const dateRange = document.getElementById('date-range').value;
-            let startDate = new Date();
+        
+        // Open order detail modal
+        function openOrderDetailModal(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
             
-            switch(dateRange) {
-                case 'today':
-                    startDate.setHours(0, 0, 0, 0); // Today at midnight
-                    break;
-                case 'week':
-                    startDate.setDate(startDate.getDate() - 7); // 7 days ago
-                    break;
-                case 'month':
-                    startDate.setMonth(startDate.getMonth() - 1); // 1 month ago
-                    break;
-                case 'year':
-                    startDate.setFullYear(startDate.getFullYear() - 1); // 1 year ago
-                    break;
+            currentOrderId = orderId;
+            
+            const orderDetailContent = document.getElementById('order-detail-content');
+            const statusBadge = getStatusBadge(order.status);
+            
+            orderDetailContent.innerHTML = `
+                <div class="order-detail-header">
+                    <img src="${order.product_image || 'https://via.placeholder.com/100'}" alt="${order.product_name}" class="order-detail-img" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                    <div class="order-detail-info">
+                        <h3>${order.product_name}</h3>
+                        ${statusBadge}
+                    </div>
+                </div>
+                
+                <div class="order-detail-content" style="margin-top: 20px;">
+                    <div class="detail-item" style="display: flex; margin-bottom: 10px;">
+                        <span class="detail-label" style="width: 150px; font-weight: 600;">အော်ဒါအမှတ်:</span>
+                        <span class="detail-value">${order.id}</span>
+                    </div>
+                    
+                    <div class="detail-item" style="display: flex; margin-bottom: 10px;">
+                        <span class="detail-label" style="width: 150px; font-weight: 600;">မှာယူသည့်အချိန်:</span>
+                        <span class="detail-value">${formatDate(order.order_time)}</span>
+                    </div>
+                    
+                    <div class="detail-item" style="display: flex; margin-bottom: 10px;">
+                        <span class="detail-label" style="width: 150px; font-weight: 600;">အမည်:</span>
+                        <span class="detail-value">${order.telegram_username}</span>
+                    </div>
+                    
+                    <div class="detail-item" style="display: flex; margin-bottom: 10px;">
+                        <span class="detail-label" style="width: 150px; font-weight: 600;">ပို့ဆောင်ရမည့်လိပ်စာ:</span>
+                        <span class="detail-value">${order.shipping_address}</span>
+                    </div>
+                    
+                    <div class="detail-item" style="display: flex; margin-bottom: 10px;">
+                        <span class="detail-label" style="width: 150px; font-weight: 600;">ငွေပေးချေမှုနည်းလမ်း:</span>
+                        <span class="detail-value">${order.payment_method}</span>
+                    </div>
+                    
+                    ${order.transaction_id ? `
+                        <div class="detail-item" style="display: flex; margin-bottom: 10px;">
+                            <span class="detail-label" style="width: 150px; font-weight: 600;">ငွေပေးချေမှုအမှတ်စဥ်:</span>
+                            <span class="detail-value">${order.transaction_id}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Show/hide approve and reject buttons based on order status
+            const approveButton = document.getElementById('approve-order-btn');
+            const rejectButton = document.getElementById('reject-order-btn');
+            
+            if (order.status === 'စစ်ဆေးနေဆဲ') {
+                approveButton.style.display = 'block';
+                rejectButton.style.display = 'block';
+            } else {
+                approveButton.style.display = 'none';
+                rejectButton.style.display = 'none';
             }
             
-            // Filter orders by date range
-            const filteredOrders = allOrders.filter(order => new Date(order.orderTime) >= startDate);
+            // Show modal
+            document.getElementById('order-detail-modal').style.display = 'flex';
+        }
+        
+        // Close order detail modal
+        function closeOrderDetailModal() {
+            document.getElementById('order-detail-modal').style.display = 'none';
+            currentOrderId = null;
+        }
+        
+        // Update order status
+        async function updateOrderStatus(status) {
+            if (!currentOrderId) return;
             
-            // Sales Chart Data - Group by date
-            const salesData = {};
-            const approvedOrders = filteredOrders.filter(order => order.status === 'အတည်ပြု');
+            const order = orders.find(o => o.id === currentOrderId);
+            if (!order) return;
             
-            if (dateRange === 'today') {
-                // Group by hour
-                for (let i = 0; i < 24; i++) {
-                    const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                    salesData[hour] = 0;
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'updateOrder',
+                        id: currentOrderId,
+                        status: status,
+                        userId: order.userId || order.user_id
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('အော်ဒါအခြေအနေ ပြောင်းလဲခြင်း', `အော်ဒါကို ${status} လုပ်ပြီးပါပြီ`, 'success');
+                    closeOrderDetailModal();
+                    loadOrders();
+                    updateDashboardStats();
+                } else {
+                    showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'အော်ဒါအခြေအနေ ပြောင်းလဲရာတွင် အမှားရှိနေပါသည်', 'error');
                 }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'အော်ဒါအခြေအနေ ပြောင်းလဲရာတွင် အမှားရှိနေပါသည်', 'error');
+            }
+        }
+        
+        // Open product modal for add/edit
+        function openProductModal(productId = null) {
+            const modalTitle = document.getElementById('product-modal-title');
+            const submitText = document.getElementById('product-submit-text');
+            const form = document.getElementById('product-form');
+            
+            form.reset();
+            
+            if (productId) {
+                // Edit existing product
+                const product = products.find(p => p.id === productId);
+                if (!product) return;
                 
-                approvedOrders.forEach(order => {
-                    const date = new Date(order.orderTime);
-                    const hour = date.getHours() < 10 ? `0${date.getHours()}:00` : `${date.getHours()}:00`;
-                    const product = allProducts.find(p => p.id === order.productId);
-                    salesData[hour] += product ? Number(product.price) : 0;
-                });
-            } else if (dateRange === 'week') {
-                // Group by day of week
-                const days = ['တနင္ဂနွေ', 'တနလ္ဂာ', 'အင်္ဂါ', 'ဗုဒ္ဓဟူး', 'ကြာသပတေး', 'သောကြာ', 'စနေ'];
-                days.forEach(day => {
-                    salesData[day] = 0;
-                });
+                currentProductId = productId;
+                modalTitle.textContent = 'ပစ္စည်းအချက်အလက် ပြင်ဆင်ရန်';
+                submitText.textContent = 'ပြင်ဆင်မည်';
                 
-                approvedOrders.forEach(order => {
-                    const date = new Date(order.orderTime);
-                    const day = days[date.getDay()];
-                    const product = allProducts.find(p => p.id === order.productId);
-                    salesData[day] += product ? Number(product.price) : 0;
-                });
-            } else if (dateRange === 'month') {
-                // Group by day of month
-                const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                for (let i = 1; i <= daysInMonth; i++) {
-                    salesData[i] = 0;
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-description').value = product.description;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-image').value = product.image;
+                
+                const soldOutRadios = document.getElementsByName('product-sold-out');
+                for (const radio of soldOutRadios) {
+                    if (radio.value === String(product.sold_out)) {
+                        radio.checked = true;
+                        break;
+                    }
                 }
-                
-                approvedOrders.forEach(order => {
-                    const date = new Date(order.orderTime);
-                    const day = date.getDate();
-                    const product = allProducts.find(p => p.id === order.productId);
-                    salesData[day] += product ? Number(product.price) : 0;
-                });
-            } else { // year
-                // Group by month
-                const months = ['ဇန်နဝါရီ', 'ဖေဖော်ဝါရီ', 'မတ်', 'ဧပြီ', 'မေ', 'ဇွန်', 'ဇူလိုင်', 'ဩဂုတ်', 'စက်တင်ဘာ', 'အောက်တိုဘာ', 'နိုဝင်ဘာ', 'ဒီဇင်ဘာ'];
-                months.forEach(month => {
-                    salesData[month] = 0;
-                });
-                
-                approvedOrders.forEach(order => {
-                    const date = new Date(order.orderTime);
-                    const month = months[date.getMonth()];
-                    const product = allProducts.find(p => p.id === order.productId);
-                    salesData[month] += product ? Number(product.price) : 0;
-                });
+            } else {
+                // Add new product
+                currentProductId = null;
+                modalTitle.textContent = 'ပစ္စည်းအသစ်ထည့်ရန်';
+                submitText.textContent = 'သိမ်းမည်';
+                document.getElementById('product-id').value = '';
             }
             
-            // Update Sales Chart
-            window.salesChart.data.labels = Object.keys(salesData);
-            window.salesChart.data.datasets[0].data = Object.values(salesData);
-            window.salesChart.update();
-            
-            // Products Chart Data
-            const totalProducts = allProducts.length;
-            const soldOutProducts = allProducts.filter(p => p.soldOut).length;
-            const soldProducts = allOrders.filter(o => o.status === 'အတည်ပြု').length;
-            const availableProducts = totalProducts - soldOutProducts;
-            
-            // Update Products Chart
-            window.productsChart.data.datasets[0].data = [soldProducts, availableProducts, soldOutProducts];
-            window.productsChart.update();
+            document.getElementById('product-modal').style.display = 'flex';
         }
-
-        // Helper Functions
-        function showToast(type, title, message) {
+        
+        // Close product modal
+        function closeProductModal() {
+            document.getElementById('product-modal').style.display = 'none';
+            currentProductId = null;
+        }
+        
+        // Save product
+        async function saveProduct() {
+            const id = document.getElementById('product-id').value || generateRandomId();
+            const name = document.getElementById('product-name').value;
+            const description = document.getElementById('product-description').value;
+            const price = document.getElementById('product-price').value;
+            const image = document.getElementById('product-image').value;
+            let soldOut = false;
+            
+            const soldOutRadios = document.getElementsByName('product-sold-out');
+            for (const radio of soldOutRadios) {
+                if (radio.checked) {
+                    soldOut = radio.value === 'true';
+                    break;
+                }
+            }
+            
+            if (!name || !description || !price || !image) {
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'ကျေးဇူးပြု၍ လိုအပ်သော အချက်အလက်အားလုံး ဖြည့်စွက်ပါ', 'error');
+                return;
+            }
+            
+            const productData = {
+                id,
+                name,
+                description,
+                price,
+                image,
+                soldOut,
+                date: new Date().toISOString()
+            };
+            
+            try {
+                const action = currentProductId ? 'updateProduct' : 'uploadProduct';
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action,
+                        ...productData
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast(
+                        currentProductId ? 'ပစ္စည်းပြင်ဆင်မှု အောင်မြင်ပါသည်' : 'ပစ္စည်းထည့်သွင်းမှု အောင်မြင်ပါသည်',
+                        currentProductId ? 'ပစ္စည်းအချက်အလက်များကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ' : 'ပစ္စည်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ',
+                        'success'
+                    );
+                    closeProductModal();
+                    loadProducts();
+                } else {
+                    showToast(
+                        'အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်',
+                        currentProductId ? 'ပစ္စည်းပြင်ဆင်ရာတွင် အမှားရှိနေပါသည်' : 'ပစ္စည်းထည့်သွင်းရာတွင် အမှားရှိနေပါသည်',
+                        'error'
+                    );
+                }
+            } catch (error) {
+                console.error('Error saving product:', error);
+                showToast(
+                    'အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်',
+                    currentProductId ? 'ပစ္စည်းပြင်ဆင်ရာတွင် အမှားရှိနေပါသည်' : 'ပစ္စည်းထည့်သွင်းရာတွင် အမှားရှိနေပါသည်',
+                    'error'
+                );
+            }
+        }
+        
+        // Open post modal for add/edit
+        function openPostModal(postId = null) {
+            const modalTitle = document.getElementById('post-modal-title');
+            const submitText = document.getElementById('post-submit-text');
+            const form = document.getElementById('post-form');
+            
+            form.reset();
+            
+            if (postId) {
+                // Edit existing post
+                const post = posts.find(p => p.id === postId);
+                if (!post) return;
+                
+                currentPostId = postId;
+                modalTitle.textContent = 'သတင်းအချက်အလက် ပြင်ဆင်ရန်';
+                submitText.textContent = 'ပြင်ဆင်မည်';
+                
+                document.getElementById('post-id').value = post.id;
+                document.getElementById('post-title').value = post.title;
+                document.getElementById('post-content').value = post.content;
+                document.getElementById('post-image').value = post.image || '';
+                document.getElementById('post-video').value = post.video || '';
+            } else {
+                // Add new post
+                currentPostId = null;
+                modalTitle.textContent = 'သတင်းအသစ်တင်ရန်';
+                submitText.textContent = 'သိမ်းမည်';
+                document.getElementById('post-id').value = '';
+            }
+            
+            document.getElementById('post-modal').style.display = 'flex';
+        }
+        
+        // Close post modal
+        function closePostModal() {
+            document.getElementById('post-modal').style.display = 'none';
+            currentPostId = null;
+        }
+        
+        // Save post
+        async function savePost() {
+            const id = document.getElementById('post-id').value || generateRandomId();
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+            const image = document.getElementById('post-image').value;
+            const video = document.getElementById('post-video').value;
+            
+            if (!title || !content) {
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'ကျေးဇူးပြု၍ လိုအပ်သော အချက်အလက်အားလုံး ဖြည့်စွက်ပါ', 'error');
+                return;
+            }
+            
+            const postData = {
+                id,
+                title,
+                content,
+                image,
+                video,
+                date: new Date().toISOString()
+            };
+            
+            try {
+                const action = currentPostId ? 'updatePost' : 'createPost';
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action,
+                        ...postData
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast(
+                        currentPostId ? 'သတင်းပြင်ဆင်မှု အောင်မြင်ပါသည်' : 'သတင်းထည့်သွင်းမှု အောင်မြင်ပါသည်',
+                        currentPostId ? 'သတင်းအချက်အလက်များကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ' : 'သတင်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ',
+                        'success'
+                    );
+                    closePostModal();
+                    loadPosts();
+                } else {
+                    showToast(
+                        'အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်',
+                        currentPostId ? 'သတင်းပြင်ဆင်ရာတွင် အမှားရှိနေပါသည်' : 'သတင်းထည့်သွင်းရာတွင် အမှားရှိနေပါသည်',
+                        'error'
+                    );
+                }
+            } catch (error) {
+                console.error('Error saving post:', error);
+                showToast(
+                    'အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်',
+                    currentPostId ? 'သတင်းပြင်ဆင်ရာတွင် အမှားရှိနေပါသည်' : 'သတင်းထည့်သွင်းရာတွင် အမှားရှိနေပါသည်',
+                    'error'
+                );
+            }
+        }
+        
+        // Open delete confirmation modal
+        function openDeleteModal(type, id) {
+            deleteType = type;
+            deleteId = id;
+            
+            const modalTitle = document.getElementById('delete-modal-title');
+            const modalText = document.getElementById('delete-modal-text');
+            
+            if (type === 'product') {
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+                
+                modalTitle.textContent = 'ပစ္စည်းဖျက်ရန် အတည်ပြုခြင်း';
+                modalText.textContent = `"${product.name}" ကို ဖျက်ရန် သေချာပါသလား?`;
+            } else if (type === 'post') {
+                const post = posts.find(p => p.id === id);
+                if (!post) return;
+                
+                modalTitle.textContent = 'သတင်းဖျက်ရန် အတည်ပြုခြင်း';
+                modalText.textContent = `"${post.title}" ကို ဖျက်ရန် သေချာပါသလား?`;
+            }
+            
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+        
+        // Close delete confirmation modal
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+            deleteType = '';
+            deleteId = null;
+        }
+        
+        // Confirm delete
+        async function confirmDelete() {
+            if (!deleteType || !deleteId) {
+                closeDeleteModal();
+                return;
+            }
+            
+            try {
+                let action;
+                let successMessage;
+                
+                if (deleteType === 'product') {
+                    action = 'deleteProduct';
+                    successMessage = 'ပစ္စည်းကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ';
+                } else if (deleteType === 'post') {
+                    action = 'deletePost';
+                    successMessage = 'သတင်းကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ';
+                }
+                
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action,
+                        id: deleteId
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('ဖျက်ခြင်း အောင်မြင်ပါသည်', successMessage, 'success');
+                    closeDeleteModal();
+                    
+                    if (deleteType === 'product') {
+                        loadProducts();
+                    } else if (deleteType === 'post') {
+                        loadPosts();
+                    }
+                } else {
+                    showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'ဖျက်ရာတွင် အမှားရှိနေပါသည်', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting:', error);
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'ဖျက်ရာတွင် အမှားရှိနေပါသည်', 'error');
+            }
+        }
+        
+        // Save site settings
+        function saveSiteSettings() {
+            showToast('ဆိုင်ဆက်တင်များ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ', 'ဆိုင်ဆက်တင်များကို အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ', 'success');
+        }
+        
+        // Save admin settings
+        function saveAdminSettings() {
+            const currentPassword = document.getElementById('admin-current-password').value;
+            const newPassword = document.getElementById('admin-new-password').value;
+            const confirmPassword = document.getElementById('admin-confirm-password').value;
+            
+            if (!currentPassword) {
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'လက်ရှိစကားဝှက်ကို ရိုက်ထည့်ပေးပါ', 'error');
+                return;
+            }
+            
+            if (currentPassword !== 'admin123') {
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'လက်ရှိစကားဝှက် မှားယွင်းနေပါသည်', 'error');
+                return;
+            }
+            
+            if (newPassword && newPassword !== confirmPassword) {
+                showToast('အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်', 'စကားဝှက်အသစ်နှင့် အတည်ပြုစကားဝှက် မတူညီပါ', 'error');
+                return;
+            }
+            
+            showToast('အက်ဒမင်ဆက်တင်များ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ', 'အက်ဒမင်ဆက်တင်များကို အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ', 'success');
+            document.getElementById('admin-settings-form').reset();
+        }
+        
+        // Filter orders by search query
+        function filterOrders(query) {
+            const rows = document.querySelectorAll('#all-orders tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filter products by search query
+        function filterProducts(query) {
+            const cards = document.querySelectorAll('#products-grid .product-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filter users by search query
+        function filterUsers(query) {
+            const cards = document.querySelectorAll('#users-grid .user-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filter posts by search query
+        function filterPosts(query) {
+            const cards = document.querySelectorAll('#posts-grid .product-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Helper functions
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'အချိန်မသိ';
+            
+            const date = new Date(dateString);
+            if (isNaN(date)) return 'အချိန်မသိ';
+            
+            return date.toLocaleDateString('my-MM', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Format price
+        function formatPrice(price) {
+            const numPrice = Number(price);
+            if (isNaN(numPrice)) return 'စျေးနှုန်းမသိ';
+            
+            return numPrice.toLocaleString('my-MM') + ' ကျပ်';
+        }
+        
+        // Generate random ID
+        function generateRandomId() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+        
+        // Get user's order count
+        function getUserOrderCount(userId) {
+            return orders.filter(order => order.userId === userId || order.user_id === userId).length;
+        }
+        
+        // Get initials from name
+        function getInitials(name) {
+            if (!name) return 'NN';
+            
+            const names = name.split(' ');
+            if (names.length === 1) return name.substring(0, 2).toUpperCase();
+            
+            return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+        }
+        
+        // Get status badge HTML
+        function getStatusBadge(status) {
+            let statusClass, icon;
+            
+            switch(status) {
+                case 'စစ်ဆေးနေဆဲ':
+                    statusClass = 'status-pending';
+                    icon = 'clock';
+                    break;
+                case 'အတည်ပြု':
+                    statusClass = 'status-approved';
+                    icon = 'check-circle';
+                    break;
+                case 'ငြင်းပယ်':
+                    statusClass = 'status-rejected';
+                    icon = 'times-circle';
+                    break;
+                default:
+                    statusClass = 'status-pending';
+                    icon = 'clock';
+            }
+            
+            return `<span class="status-badge ${statusClass}"><i class="fas fa-${icon}"></i> ${status}</span>`;
+        }
+        
+        // Show toast notification
+        function showToast(title, message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
+            
             toast.innerHTML = `
                 <div class="toast-icon">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
                 </div>
                 <div class="toast-message">
                     <div class="toast-title">${title}</div>
                     <div class="toast-body">${message}</div>
                 </div>
             `;
+            
             document.body.appendChild(toast);
             
             setTimeout(() => {
                 toast.remove();
             }, 3000);
         }
-
-        function generateSampleUsers(count) {
-            const users = [];
-            
-            for (let i = 0; i < count; i++) {
-                const id = Math.random().toString(36).substr(2, 6);
-                const userOrders = allOrders.filter(order => order.userId === id);
-                
-                users.push({
-                    id: id,
-                    name: `User ${i + 1}`,
-                    email: `user${i + 1}@example.com`,
-                    phone: `0978${Math.floor(Math.random() * 10000000)}`,
-                    address: `${i + 1} Main Street, Yangon`,
-                    createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
-                    orderCount: userOrders.length
-                });
-            }
-            
-            // Add the actual user IDs from orders
-            allOrders.forEach(order => {
-                if (!users.some(u => u.id === order.userId)) {
-                    const userOrders = allOrders.filter(o => o.userId === order.userId);
-                    
-                    users.push({
-                        id: order.userId,
-                        name: `Customer ${order.userId.substring(0, 4)}`,
-                        email: `${order.userId}@example.com`,
-                        phone: order.telegramUsername ? `0978${Math.floor(Math.random() * 10000000)}` : null,
-                        address: order.shippingAddress || null,
-                        createdAt: order.orderTime,
-                        orderCount: userOrders.length
-                    });
-                }
-            });
-            
-            return users;
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if admin is logged in
-            if (localStorage.getItem('admin_logged_in') === 'true') {
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('admin-container').style.display = 'block';
-                document.getElementById('admin-name').textContent = 'Admin';
-                initializeDashboard();
-            }
-            
-            // Sidebar navigation
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Hide all tabs
-                    document.querySelectorAll('.tab-content').forEach(tab => {
-                        tab.classList.remove('active');
-                    });
-                    
-                    // Remove active class from all menu items
-                    document.querySelectorAll('.menu-item').forEach(menuItem => {
-                        menuItem.classList.remove('active');
-                    });
-                    
-                    // Show selected tab
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                    
-                    // Add active class to selected menu item
-                    this.classList.add('active');
-                    
-                    // If orders tab is selected, reset the notification counter
-                    if (tabId === 'orders') {
-                        pendingOrdersCount = 0;
-                        updateOrderNotification();
-                    }
-                });
-            });
-            
-            // Date range filter for dashboard
-            document.getElementById('date-range').addEventListener('change', updateCharts);
-            
-            // Order status filter
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-filter');
-                    
-                    // Remove active class from all filter buttons
-                    this.parentElement.querySelectorAll('.filter-btn').forEach(filterBtn => {
-                        filterBtn.classList.remove('active');
-                    });
-                    
-                    // Add active class to selected filter button
-                    this.classList.add('active');
-                    
-                    // Filter orders
-                    let filteredOrders;
-                    if (filter === 'all') {
-                        filteredOrders = allOrders;
-                    } else if (filter === 'pending') {
-                        filteredOrders = allOrders.filter(order => order.status === 'ဆိုင်းငံ့');
-                    } else if (filter === 'approved') {
-                        filteredOrders = allOrders.filter(order => order.status === 'အတည်ပြု');
-                    } else if (filter === 'rejected') {
-                        filteredOrders = allOrders.filter(order => order.status === 'ပယ်ဖျက်');
-                    }
-                    
-                    // Update order list
-                    if (this.closest('.order-list').querySelector('#recent-orders')) {
-                        displayRecentOrders(filteredOrders);
-                    } else {
-                        displayOrders(filteredOrders, 'all-orders');
-                    }
-                });
-            });
-            
-            // Close order detail modal
-            document.getElementById('close-order-modal').addEventListener('click', function() {
-                document.getElementById('order-detail-modal').style.display = 'none';
-            });
-            
-            // Add product button
-            document.getElementById('add-product-btn').addEventListener('click', function() {
-                document.getElementById('product-modal-title').textContent = 'ပစ္စည်းအသစ်ထည့်ရန်';
-                resetProductForm();
-                document.getElementById('product-modal').style.display = 'flex';
-            });
-            
-            // Close product modal
-            document.getElementById('close-product-modal').addEventListener('click', function() {
-                document.getElementById('product-modal').style.display = 'none';
-            });
-            
-            // Save product
-            document.getElementById('save-product-btn').addEventListener('click', saveProduct);
-            
-            // Close user detail modal
-            document.getElementById('close-user-modal').addEventListener('click', function() {
-                document.getElementById('user-detail-modal').style.display = 'none';
-            });
-            
-            // Password toggle
-            document.querySelectorAll('.password-toggle').forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    const passwordField = this.previousElementSibling;
-                    const icon = this.querySelector('i');
-                    
-                    if (passwordField.type === 'password') {
-                        passwordField.type = 'text';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        passwordField.type = 'password';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
-                    }
-                });
-            });
-            
-            // Save settings
-            document.getElementById('save-settings-btn').addEventListener('click', function() {
-                const name = document.getElementById('admin-name-input').value;
-                const currentPassword = document.getElementById('current-password').value;
-                const newPassword = document.getElementById('new-password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-                
-                if (currentPassword && newPassword && confirmPassword) {
-                    if (currentPassword !== VALID_PASSWORD) {
-                        showToast('error', 'အမှားဖြစ်ပြီ', 'လက်ရှိစကားဝှက် မမှန်ပါ');
-                        return;
-                    }
-                    
-                    if (newPassword !== confirmPassword) {
-                        showToast('error', 'အမှားဖြစ်ပြီ', 'စကားဝှက်အသစ်နှင့် စကားဝှက်အသစ်အတည်ပြု မတူပါ');
-                        return;
-                    }
-                    
-                    showToast('success', 'အောင်မြင်ပါပြီ', 'စကားဝှက် ပြောင်းလဲခြင်း အောင်မြင်ပါပြီ');
-                    document.getElementById('current-password').value = '';
-                    document.getElementById('new-password').value = '';
-                    document.getElementById('confirm-password').value = '';
-                }
-                
-                if (name) {
-                    document.getElementById('admin-name').textContent = name;
-                    showToast('success', 'အောင်မြင်ပါပြီ', 'အမည် ပြောင်းလဲခြင်း အောင်မြင်ပါပြီ');
-                }
-            });
-            
-            // Save store settings
-            document.getElementById('save-store-settings-btn').addEventListener('click', function() {
-                showToast('success', 'အောင်မြင်ပါပြီ', 'ဆိုင်ဆက်တင်များ ပြောင်းလဲခြင်း အောင်မြင်ပါပြီ');
-            });
-            
-            // Hitting enter in login fields should trigger login
-            document.getElementById('password').addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') {
-                    login();
-                }
-            });
-        });
-
-        // Close modals when clicking outside
-        window.addEventListener('click', function(event) {
-            const orderModal = document.getElementById('order-detail-modal');
-            const productModal = document.getElementById('product-modal');
-            const userModal = document.getElementById('user-detail-modal');
-            
-            if (event.target === orderModal) {
-                orderModal.style.display = 'none';
-            }
-            
-            if (event.target === productModal) {
-                productModal.style.display = 'none';
-            }
-            
-            if (event.target === userModal) {
-                userModal.style.display = 'none';
-            }
-        });
     </script>
 </body>
 </html>
