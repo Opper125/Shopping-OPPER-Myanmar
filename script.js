@@ -273,7 +273,7 @@ function createProductCard(product) {
     const formattedDate = formatDate(timestamp);
     const formattedPrice = formatPrice(product.price);
     const soldOutBadge = product.sold_out ? 
-        `<div class="sold-out-overlay"><img src="https://i.imgur.com/6HoXSDo.png" alt="အရောင်းပြီး" class="sold-out"></div>` : '';
+        `<div class="sold-out-overlay"><img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/soldout-icon.png" alt="အရောင်းပြီး" class="sold-out"></div>` : '';
 
     return `
         <div class="product-card">
@@ -290,16 +290,12 @@ function createProductCard(product) {
                 </div>
                 <div class="payment-options">
                     <div class="payment-option">
-                        <img src="https://i.imgur.com/pnlVj08.png" alt="KBZ Pay">
+                        <img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/kpay-logo.png" alt="KBZ Pay">
                         <span>KBZ Pay</span>
                     </div>
                     <div class="payment-option">
-                        <img src="https://i.imgur.com/33YDkfY.png" alt="Wave Money">
+                        <img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/wave-logo.png" alt="Wave Money">
                         <span>Wave Money</span>
-                    </div>
-                    <div class="payment-option">
-                        <img src="https://i.imgur.com/6GLbxGD.png" alt="Cash on Delivery">
-                        <span>ပစ္စည်းရောက်မှငွေချေရန်</span>
                     </div>
                 </div>
                 <button class="order-btn" ${product.sold_out ? 'disabled' : ''} onclick="openOrderModal(${JSON.stringify(product).replace(/"/g, '&quot;')})">
@@ -419,21 +415,16 @@ function openOrderModal(product) {
                 <div class="payment-method-options">
                     <label class="payment-method-option">
                         <input type="radio" name="payment-method" value="KBZ Pay" required>
-                        <img src="https://i.imgur.com/pnlVj08.png" alt="KBZ Pay">
+                        <img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/kpay-logo.png" alt="KBZ Pay">
                         <span>KBZ Pay</span>
                     </label>
                     
                     <label class="payment-method-option">
                         <input type="radio" name="payment-method" value="Wave Money" required>
-                        <img src="https://i.imgur.com/33YDkfY.png" alt="Wave Money">
+                        <img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/wave-logo.png" alt="Wave Money">
                         <span>Wave Money</span>
                     </label>
                     
-                    <label class="payment-method-option">
-                        <input type="radio" name="payment-method" value="ပစ္စည်းရောက်မှငွေချေရန်" required checked>
-                        <img src="https://i.imgur.com/6GLbxGD.png" alt="Cash on Delivery">
-                        <span>ပစ္စည်းရောက်မှငွေချေရန်</span>
-                    </label>
                 </div>
             </div>
             
