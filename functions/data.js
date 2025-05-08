@@ -4,7 +4,7 @@ const { createClient } = require('@supabase/supabase-js');
 // Supabase client initialization
 const supabase = createClient(
     'https://obkjucldecgowkwjtecb.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ia2p1Y2xkZWNnb3drd2p0ZWNiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTcwMzc0OSwiZXhwIjoyMDYxMjc5NzQ5fQ.4pa1KQdHH1jkVfzkHEANIenehvKzk_Ofy7Hc7211Bf8'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ia2p1Y2xkZWNnb3drd2p0ZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MDM3NDksImV4cCI6MjA2MTI3OTc0OX0.KOtyYOwpE1GHGldFfVRxdflhyBaIDSN-ZQr7UEzb3Ao'
 );
 
 // Pusher configuration
