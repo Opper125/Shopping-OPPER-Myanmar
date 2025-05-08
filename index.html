@@ -5,333 +5,1050 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping OPPER Myanmar</title>
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --accent-color: #ffbe76;
+            --dark-color: #2c3e50;
+            --light-color: #f9f9f9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
         body {
-            font-family: 'Pyidaungsu', sans-serif;
+            font-family: 'Roboto', 'Pyidaungsu', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
+            min-height: 100vh;
         }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            padding-bottom: 80px;
         }
+        
         .header {
             text-align: center;
             padding: 20px;
             position: relative;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
+        
         .header img {
-            width: 150px;
-            animation: fadeIn 1s ease-in;
+            width: 180px;
+            animation: pulse 2s infinite;
         }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         .user-id {
             position: absolute;
             top: 10px;
             right: 20px;
             font-size: 14px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+        
         .nav {
-            background: #2c3e50;
-            padding: 10px 0;
+            background: var(--dark-color);
+            padding: 15px 0;
             position: fixed;
             bottom: 0;
             width: 100%;
             display: flex;
             justify-content: space-around;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
+        
         .nav a {
             color: white;
             text-decoration: none;
             font-size: 16px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             transition: all 0.3s ease;
+            padding: 5px 15px;
+            border-radius: 10px;
         }
-        .nav a:hover {
-            color: #3498db;
-            transform: scale(1.1);
+        
+        .nav a:hover, .nav a.active {
+            color: var(--primary-color);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
         }
+        
         .nav img {
-            width: 20px;
-            margin-right: 5px;
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+            filter: brightness(0) invert(1);
         }
+        
+        .nav a:hover img, .nav a.active img {
+            filter: none;
+        }
+        
         .products, .orders {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-bottom: 60px;
         }
+        
         .product-card, .order-card {
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            animation: slideIn 0.5s ease;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
+        .product-card:hover, .order-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
         .product-card img, .order-card img {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: transform 0.5s ease;
         }
+        
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .product-card h3, .order-card h3 {
+            margin: 10px 0;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+        }
+        
+        .product-card p, .order-card p {
+            margin: 8px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        .date {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
         .sold-out {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) rotate(-15deg);
             width: 150px;
             height: 150px;
             opacity: 0.9;
             z-index: 1;
+            animation: bounce 1s ease infinite;
         }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-15deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(-15deg) scale(1.1); }
+        }
+        
         .order-btn {
-            background: #27ae60;
+            background: var(--primary-color);
             color: white;
-            padding: 10px;
+            padding: 12px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
             width: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
+        
         .order-btn:hover {
-            background: #219653;
+            background: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
+        
+        .order-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
         .order-btn:disabled {
             background: #95a5a6;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
+        
+        .payment-options {
+            margin: 15px 0;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
         .payment-option {
             display: flex;
             align-items: center;
-            margin: 5px 0;
-            background: #f1f1f1;
-            padding: 5px;
-            border-radius: 5px;
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
+        
         .payment-option img {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
-            border-radius: 3px;
+            width: 35px;
+            height: 35px;
+            margin-right: 15px;
+            border-radius: 5px;
+            object-fit: contain;
         }
-        .status-pending { background: rgba(241, 196, 15, 0.3); padding: 5px; border-radius: 3px; }
-        .status-approved { background: rgba(46, 204, 113, 0.3); padding: 5px; border-radius: 3px; }
-        .status-rejected { background: rgba(231, 76, 60, 0.3); padding: 5px; border-radius: 3px; }
+        
+        .payment-option span {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .status-pending { 
+            background: rgba(241, 196, 15, 0.3); 
+            padding: 8px 12px; 
+            border-radius: 5px; 
+            color: #7d6608;
+            font-weight: 500;
+        }
+        
+        .status-approved { 
+            background: rgba(46, 204, 113, 0.3); 
+            padding: 8px 12px; 
+            border-radius: 5px; 
+            color: #1e8449;
+            font-weight: 500;
+        }
+        
+        .status-rejected { 
+            background: rgba(231, 76, 60, 0.3); 
+            padding: 8px 12px; 
+            border-radius: 5px; 
+            color: #a93226;
+            font-weight: 500;
+        }
+        
         .success-message {
             position: fixed;
             top: 50%;
-            left: -300px; /* ဘယ်ဘက်ကနေ စမယ် */
+            left: -300px;
             transform: translateY(-50%);
-            background: rgba(46, 204, 113, 0.9); /* အစိမ်းရောင် */
+            background: rgba(46, 204, 113, 0.95);
             color: white;
             padding: 15px 30px;
-            border-radius: 5px;
+            border-radius: 10px;
             font-size: 18px;
             z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             animation: slideInOut 3s ease-in-out forwards;
+            display: flex;
+            align-items: center;
         }
+        
+        .success-message::before {
+            content: '✓';
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
         @keyframes slideInOut {
-            0% { left: -300px; }
-            50% { left: 50%; transform: translate(-50%, -50%); }
-            100% { left: 100%; transform: translate(0, -50%); }
+            0% { left: -300px; opacity: 0; }
+            15% { left: 50%; transform: translate(-50%, -50%); opacity: 1; }
+            85% { left: 50%; transform: translate(-50%, -50%); opacity: 1; }
+            100% { left: 100%; transform: translate(0, -50%); opacity: 0; }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeInOut 3s ease-in-out forwards;
+            display: flex;
+            align-items: center;
         }
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        
+        .error-message::before {
+            content: '✕';
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 24px;
+            font-weight: bold;
         }
-        @media (max-width: 600px) {
-            .nav a { font-size: 14px; }
-            .product-card, .order-card { margin: 10px; }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .about-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 60px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .about-container h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .about-container p {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .about-container a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .about-container a:hover {
+            text-decoration: underline;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .contact-item img {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            width: 100%;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 107, 107, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        
+        .empty-state img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #888;
+        }
+        
+        .order-form {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .order-form.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .order-form-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(50px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .order-form.active .order-form-content {
+            transform: translateY(0);
+        }
+        
+        .close-form {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        
+        .form-submit {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .form-submit:hover {
+            background: #ff5252;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .product-details {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-details img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        
+        .product-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+        }
+        
+        .product-info .price {
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .products, .orders {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            .product-card, .order-card {
+                padding: 15px;
+            }
+            
+            .product-card img, .order-card img {
+                height: 180px;
+            }
+            
+            .header img {
+                width: 150px;
+            }
+            
+            .nav a {
+                font-size: 14px;
+            }
+            
+            .nav img {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .user-id {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+            
+            .product-card h3, .order-card h3 {
+                font-size: 1.1rem;
+            }
+            
+            .price {
+                font-size: 1.1rem;
+            }
+            
+            .order-btn {
+                padding: 10px;
+            }
+            
+            .nav a {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            
+            .nav img {
+                width: 18px;
+                height: 18px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="/assets/logo.png" alt="OPPER Logo">
-            <div class="user-id">ID: <span id="user-id"></span></div>
+            <img src="/assets/logo.png" alt="OPPER Logo" class="animate__animated animate__fadeIn">
+            <div class="user-id animate__animated animate__fadeInRight">ID: <span id="user-id"></span></div>
         </div>
         <div id="content">
-            <div class="products" id="product-list"></div>
-            <div class="orders" id="order-list" style="display: none;"></div>
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="products animate__animated animate__fadeIn" id="product-list" style="display: none;"></div>
+            <div class="orders animate__animated animate__fadeIn" id="order-list" style="display: none;"></div>
         </div>
     </div>
+    
     <div class="nav">
-        <a href="#home" onclick="showSection('product-list')"><img src="/assets/home-icon.png" alt="Home">Home</a>
-        <a href="#orderhost" onclick="showSection('order-list')"><img src="/assets/order-icon.png" alt="Order">Orderhost</a>
-        <a href="#about" onclick="showAbout()"><img src="/assets/about-icon.png" alt="About">About</a>
+        <a href="#home" id="nav-home" class="active" onclick="showSection('product-list')">
+            <img src="/assets/home-icon.png" alt="Home">
+            <span>ပင်မစာမျက်နှာ</span>
+        </a>
+        <a href="#orderhost" id="nav-orders" onclick="showSection('order-list')">
+            <img src="/assets/order-icon.png" alt="Order">
+            <span>မှာယူမှုများ</span>
+        </a>
+        <a href="#about" id="nav-about" onclick="showAbout()">
+            <img src="/assets/about-icon.png" alt="About">
+            <span>အကြောင်း</span>
+        </a>
+    </div>
+    
+    <div id="order-form" class="order-form">
+        <div class="order-form-content">
+            <button class="close-form" onclick="closeOrderForm()">&times;</button>
+            <div id="product-order-details" class="product-details"></div>
+            <div class="form-group">
+                <label for="payment-method">ငွေလွှဲနည်းလမ်း</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="kpay" name="payment-method" value="Kpay" checked>
+                        <label for="kpay">Kpay</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="wave" name="payment-method" value="Wave">
+                        <label for="wave">Wave</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="transaction-id">ငွေလွှဲလုပ်ငန်းစဉ် နောက်ဆုံး ၆ လုံး</label>
+                <input type="text" id="transaction-id" class="form-control" maxlength="6" placeholder="ဥပမာ - 123456">
+            </div>
+            <div class="form-group">
+                <label for="telegram-username">Telegram Username</label>
+                <input type="text" id="telegram-username" class="form-control" placeholder="ဥပမာ - username">
+            </div>
+            <button id="submit-order" class="form-submit">မှာယူမည်</button>
+        </div>
     </div>
 
     <script>
-        const userId = localStorage.getItem('userId') || Math.random().toString(36).substr(2, 6);
+        // Global variables
+        let currentProductId = '';
+        let currentProductName = '';
+        let currentProductImage = '';
+        let currentProductPrice = '';
+        let isLoading = true;
+        
+        // Initialize user ID
+        const userId = localStorage.getItem('userId') || Math.random().toString(36).substr(2, 9);
         localStorage.setItem('userId', userId);
         document.getElementById('user-id').textContent = userId;
 
+        // Initialize Pusher
         const pusher = new Pusher('8c2540a0c402d0c7aafe', {
             cluster: 'ap1',
             encrypted: true
         });
+        
         const channel = pusher.subscribe('orders-' + userId);
         const productChannel = pusher.subscribe('products');
 
+        // Event listeners
         channel.bind('orderUpdated', (data) => {
             if (data.userId === userId) {
+                console.log('Order updated:', data);
+                showSuccessMessage('မှာယူမှု အခြေအနေ ပြောင်းလဲသွားပါပြီ');
                 fetchOrders();
                 fetchProducts();
             }
         });
 
         productChannel.bind('productUpdated', () => {
+            console.log('Products updated');
             fetchProducts();
         });
 
+        // Fetch products from server
         async function fetchProducts() {
             try {
+                showLoading();
                 const response = await fetch('/.netlify/functions/data?action=getProducts');
                 if (!response.ok) throw new Error('Failed to fetch products');
                 const products = await response.json();
+                
                 const productList = document.getElementById('product-list');
                 productList.innerHTML = '';
-                products.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        ${product.soldOut ? '<img src="/assets/soldout-icon.png" class="sold-out" alt="Sold Out">' : ''}
-                        <img src="${product.image}" alt="${product.name}">
-                        <h3>${product.name}</h3>
-                        <p>${product.description}</p>
-                        <p>တန်ဖိုး: ${product.price} MMK</p>
-                        <p>ရက်စွဲ: ${product.date}</p>
-                        <div class="payment-option">
-                            <img src="/assets/kpay-logo.png" alt="Kpay">
-                            <span>Kpay: 09786284670 (DHMK)</span>
+                
+                if (products.length === 0) {
+                    productList.innerHTML = `
+                        <div class="empty-state">
+                            <img src="/assets/empty-box.png" alt="No Products">
+                            <h3>ပစ္စည်းများ မရှိသေးပါ</h3>
+                            <p>နောက်မှ ပြန်လာကြည့်ပါ</p>
                         </div>
-                        <div class="payment-option">
-                            <img src="/assets/wave-logo.png" alt="Wave">
-                            <span>Wave: 09786284670 (DHMK)</span>
-                        </div>
-                        <button class="order-btn" ${product.soldOut ? 'disabled' : ''} onclick="orderProduct('${product.id}', '${product.name}', '${product.image}')">
-                            ${product.soldOut ? 'Sold Out' : 'မှာယူမည်'}
-                        </button>
                     `;
-                    productList.appendChild(card);
-                });
+                } else {
+                    products.forEach((product, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card animate__animated animate__fadeIn';
+                        card.style.animationDelay = `${index * 0.1}s`;
+                        card.innerHTML = `
+                            ${product.soldOut ? '<img src="/assets/soldout-icon.png" class="sold-out" alt="Sold Out">' : ''}
+                            <img src="${product.image}" alt="${product.name}" loading="lazy">
+                            <h3>${product.name}</h3>
+                            <p>${product.description}</p>
+                            <div class="price">${formatPrice(product.price)} MMK</div>
+                            <div class="date">ရက်စွဲ: ${formatDate(product.date)}</div>
+                            
+                            <div class="payment-options">
+                                <div class="payment-option">
+                                    <img src="/assets/kpay-logo.png" alt="Kpay">
+                                    <span>Kpay: ${product.phone || '09786284670'} (DHMK)</span>
+                                </div>
+                                <div class="payment-option">
+                                    <img src="/assets/wave-logo.png" alt="Wave">
+                                    <span>Wave: ${product.phone || '09786284670'} (DHMK)</span>
+                                </div>
+                            </div>
+                            
+                            <button class="order-btn" ${product.soldOut ? 'disabled' : ''} 
+                                onclick="openOrderForm('${product.id}', '${product.name}', '${product.image}', '${product.price}')">
+                                ${product.soldOut ? 'ရောင်းပြီးပါပြီ' : 'မှာယူမည်'}
+                            </button>
+                        `;
+                        productList.appendChild(card);
+                    });
+                }
+                hideLoading();
             } catch (error) {
                 console.error('Error fetching products:', error);
-                alert('ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                showErrorMessage('ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                hideLoading();
             }
         }
 
+        // Fetch orders from server
         async function fetchOrders() {
             try {
+                showLoading();
                 const response = await fetch('/.netlify/functions/data?action=getOrders');
                 if (!response.ok) throw new Error('Failed to fetch orders');
                 const orders = await response.json();
+                
                 const orderList = document.getElementById('order-list');
                 orderList.innerHTML = '';
-                orders.forEach(order => {
-                    if (order.userId === userId) {
+                
+                const userOrders = orders.filter(order => order.userId === userId);
+                
+                if (userOrders.length === 0) {
+                    orderList.innerHTML = `
+                        <div class="empty-state">
+                            <img src="/assets/empty-order.png" alt="No Orders">
+                            <h3>မှာယူမှုများ မရှိသေးပါ</h3>
+                            <p>ပစ္စည်းတစ်ခုခုကို မှာယူပြီးမှ ဤနေရာတွင် ပြပါမည်</p>
+                        </div>
+                    `;
+                } else {
+                    userOrders.forEach((order, index) => {
                         const card = document.createElement('div');
-                        card.className = 'order-card';
+                        card.className = 'order-card animate__animated animate__fadeIn';
+                        card.style.animationDelay = `${index * 0.1}s`;
                         card.innerHTML = `
-                            <img src="${order.productImage}" alt="${order.productName}">
+                            <img src="${order.productImage}" alt="${order.productName}" loading="lazy">
                             <h3>${order.productName}</h3>
                             <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
                             <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
                             <p>Telegram: @${order.telegramUsername}</p>
-                            <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
+                            <p>အချိန်: ${formatDateTime(order.orderTime)}</p>
                             <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
                         `;
                         orderList.appendChild(card);
-                    }
-                });
+                    });
+                }
+                hideLoading();
             } catch (error) {
                 console.error('Error fetching orders:', error);
-                alert('မှာယူမှုများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                showErrorMessage('မှာယူမှုများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                hideLoading();
             }
         }
 
-        async function orderProduct(productId, productName, productImage) {
-            const paymentMethod = prompt("ငွေလွှဲနည်းလမ်း (Kpay/Wave) ရွေးပါ:");
-            const transactionId = prompt("ငွေလွှဲလုပ်ငန်းစဉ် နောက်ဆုံး ၆ လုံးထည့်ပါ:");
-            const telegramUsername = prompt("Telegram Username ထည့်ပါ:");
-            if (paymentMethod && transactionId && telegramUsername) {
-                try {
-                    const orderData = {
-                        action: 'placeOrder',
-                        productId,
-                        productName,
-                        productImage,
-                        transactionId: transactionId.slice(-6),
-                        telegramUsername,
-                        paymentMethod,
-                        status: 'ဆိုင်းငံ့',
-                        orderTime: new Date().toISOString(),
-                        userId,
-                        id: Date.now().toString()
-                    };
-                    const response = await fetch('/.netlify/functions/data', {
-                        method: 'POST',
-                        body: JSON.stringify(orderData)
-                    });
-                    if (response.ok) {
-                        showSuccessMessage();
-                        fetchProducts();
-                        fetchOrders();
-                    } else {
-                        alert('မှာယူမှု မအောင်မြင်ပါ။');
-                    }
-                } catch (error) {
-                    console.error('Error placing order:', error);
-                    alert('မှာယူမှု လုပ်ရာတွင် အမှားဖြစ်ပါသည်။');
+        // Open order form
+        function openOrderForm(productId, productName, productImage, productPrice) {
+            currentProductId = productId;
+            currentProductName = productName;
+            currentProductImage = productImage;
+            currentProductPrice = productPrice;
+            
+            const productDetails = document.getElementById('product-order-details');
+            productDetails.innerHTML = `
+                <img src="${productImage}" alt="${productName}">
+                <div class="product-info">
+                    <h3>${productName}</h3>
+                    <div class="price">${formatPrice(productPrice)} MMK</div>
+                </div>
+            `;
+            
+            document.getElementById('order-form').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Set up submit button event
+            document.getElementById('submit-order').onclick = submitOrder;
+        }
+
+        // Close order form
+        function closeOrderForm() {
+            document.getElementById('order-form').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Reset form
+            document.getElementById('transaction-id').value = '';
+            document.getElementById('telegram-username').value = '';
+            document.getElementById('kpay').checked = true;
+        }
+
+        // Submit order
+        async function submitOrder() {
+            const transactionId = document.getElementById('transaction-id').value;
+            const telegramUsername = document.getElementById('telegram-username').value;
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            
+            if (!transactionId || !telegramUsername) {
+                showErrorMessage('အချက်အလက်အားလုံး ဖြည့်ပါ');
+                return;
+            }
+            
+            if (transactionId.length !== 6 || !/^\d+$/.test(transactionId)) {
+                showErrorMessage('ငွေလွှဲနံပါတ် ၆ လုံး ဖြစ်ရပါမည်');
+                return;
+            }
+            
+            try {
+                const orderData = {
+                    action: 'placeOrder',
+                    productId: currentProductId,
+                    productName: currentProductName,
+                    productImage: currentProductImage,
+                    productPrice: currentProductPrice,
+                    transactionId: transactionId,
+                    telegramUsername: telegramUsername.replace('@', ''),
+                    paymentMethod,
+                    status: 'ဆိုင်းငံ့',
+                    orderTime: new Date().toISOString(),
+                    userId,
+                    id: Date.now().toString()
+                };
+                
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (response.ok) {
+                    closeOrderForm();
+                    showSuccessMessage('မှာယူမှု အောင်မြင်ပါသည်');
+                    console.log('Order placed successfully:', orderData);
+                    fetchProducts();
+                    fetchOrders();
+                    showSection('order-list');
+                } else {
+                    showErrorMessage('မှာယူမှု မအောင်မြင်ပါ။');
                 }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                showErrorMessage('မှာယူမှု လုပ်ရာတွင် အမှားဖြစ်ပါသည်။');
             }
         }
 
-        function showSuccessMessage() {
-            const message = document.createElement('div');
-            message.className = 'success-message';
-            message.textContent = 'အောင်မြင်ပါသည်';
-            document.body.appendChild(message);
+        // Show success message
+        function showSuccessMessage(message) {
+            const msgElement = document.createElement('div');
+            msgElement.className = 'success-message animate__animated animate__fadeIn';
+            msgElement.textContent = message;
+            document.body.appendChild(msgElement);
+            
             setTimeout(() => {
-                message.remove();
-            }, 3000); // 3 စက္ကန့်ပြီး ဖျက်မယ်
+                msgElement.remove();
+            }, 3000);
         }
 
+        // Show error message
+        function showErrorMessage(message) {
+            const msgElement = document.createElement('div');
+            msgElement.className = 'error-message animate__animated animate__fadeIn';
+            msgElement.textContent = message;
+            document.body.appendChild(msgElement);
+            
+            setTimeout(() => {
+                msgElement.remove();
+            }, 3000);
+        }
+
+        // Show section
         function showSection(sectionId) {
-            document.getElementById('product-list').style.display = sectionId === 'product-list' ? 'grid' : 'none';
-            document.getElementById('order-list').style.display = sectionId === 'order-list' ? 'grid' : 'none';
-            if (sectionId === 'product-list') fetchProducts();
-            if (sectionId === 'order-list') fetchOrders();
+            // Update navigation
+            document.querySelectorAll('.nav a').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (sectionId === 'product-list') {
+                document.getElementById('nav-home').classList.add('active');
+                fetchProducts();
+            } else if (sectionId === 'order-list') {
+                document.getElementById('nav-orders').classList.add('active');
+                fetchOrders();
+            } else if (sectionId === 'about') {
+                document.getElementById('nav-about').classList.add('active');
+            }
+            
+            // Hide all sections
+            document.getElementById('product-list').style.display = 'none';
+            document.getElementById('order-list').style.display = 'none';
+            
+            // Show selected section
+            if (sectionId === 'product-list' || sectionId === 'order-list') {
+                document.getElementById(sectionId).style.display = 'grid';
+            }
         }
 
+        // Show about section
         function showAbout() {
+            document.querySelectorAll('.nav a').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.getElementById('nav-about').classList.add('active');
+            
             const content = document.getElementById('content');
             content.innerHTML = `
-                <h2>ကျွန်ုပ်တို့အကြောင်း</h2>
-                <p>Email: crakb68@gmail.com</p>
-                <p>Phone: 09983254678</p>
-                <p>Telegram: <a href="https://t.me/OPPER101">t.me/OPPER101</a></p>
-                <p>လိပ်စာ: Yangon No 34, Ayarwade GG 9</p>
+                <div class="about-container animate__animated animate__fadeIn">
+                    <h2>ကျွန်ုပ်တို့အကြောင်း</h2>
+                    
+                    <div class="contact-item">
+                        <img src="/assets/email-icon.png" alt="Email">
+                        <p>Email: crakb68@gmail.com</p>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <img src="/assets/phone-icon.png" alt="Phone">
+                        <p>Phone: 09983254678</p>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <img src="/assets/telegram-icon.png" alt="Telegram">
+                        <p>Telegram: <a href="https://t.me/OPPER101" target="_blank">t.me/OPPER101</a></p>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <img src="/assets/location-icon.png" alt="Location">
+                        <p>လိပ်စာ: Yangon No 34, Ayarwade GG 9</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3>ကျွန်ုပ်တို့၏ ဝန်ဆောင်မှုများ</h3>
+                        <p>OPPER Shopping သည် မြန်မာနိုင်ငံတွင် အရည်အသွေးမြင့် ပစ္စည်းများကို သင့်တင့်သော စျေးနှုန်းဖြင့် ရောင်းချပေးနေသော အွန်လိုင်းစျေးဝယ်ဝက်ဘ်ဆိုက် ဖြစ်ပါသည်။ ကျွန်ုပ်တို့သည် သုံးစွဲသူများ၏ စိတ်ကျေနပ်မှုကို အမြဲဦးစားပေးပါသည်။</p>
+                    </div>
+                </div>
             `;
         }
 
+        // Show loading spinner
+        function showLoading() {
+            if (!isLoading) {
+                document.getElementById('loading').style.display = 'flex';
+                isLoading = true;
+            }
+        }
+
+        // Hide loading spinner
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            isLoading = false;
+        }
+
+        // Format price with commas
+        function formatPrice(price) {
+            return Number(price).toLocaleString('en-US');
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('my-MM', options);
+        }
+
+        // Format date and time
+        function formatDateTime(dateTimeString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateTimeString).toLocaleDateString('my-MM', options);
+        }
+
+        // Initialize on page load
         window.onload = () => {
-            fetchProducts();
-            fetchOrders();
+            showSection('product-list');
         };
     </script>
 </body>
