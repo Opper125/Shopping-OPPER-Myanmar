@@ -5,53 +5,468 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload - Shopping OPPER Myanmar</title>
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
-        body { font-family: 'Pyidaungsu', sans-serif; margin: 0; padding: 20px; background: #ecf0f1; }
-        .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, textarea, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #2980b9; color: white; border: none; cursor: pointer; transition: background 0.3s ease; }
-        button:hover { background: #3498db; }
-        .history { margin-top: 20px; }
-        .history-item { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-        #login-container { display: block; }
-        #upload-container { display: none; }
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --accent-color: #ffbe76;
+            --dark-color: #2c3e50;
+            --light-color: #f9f9f9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Roboto', 'Pyidaungsu', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .form-container h2 {
+            text-align: center;
+            color: var(--dark-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: var(--dark-color);
+        }
+        
+        .btn-secondary:hover {
+            background: #1a2530;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .history {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .history h2 {
+            text-align: center;
+            color: var(--dark-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .history-item {
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            background: #f1f3f5;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .history-item-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .history-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .history-item-details {
+            flex: 1;
+        }
+        
+        .history-item-details h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+        
+        .history-item-details p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .history-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #3dbeb6;
+        }
+        
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .sold-out-badge {
+            background: var(--warning-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .image-preview-placeholder {
+            color: #aaa;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(46, 204, 113, 0.95);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 2.5s forwards;
+            display: flex;
+            align-items: center;
+        }
+        
+        .success-message::before {
+            content: '✓';
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 2.5s forwards;
+            display: flex;
+            align-items: center;
+        }
+        
+        .error-message::before {
+            content: '✕';
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            width: 100%;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 107, 107, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-state img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #888;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container, .history {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="form-container" id="login-container">
-        <h2>Admin Login</h2>
-        <input type="email" id="email" placeholder="အီးမေးလ်" required>
-        <input type="password" id="password" placeholder="စကားဝှက်" required>
-        <button onclick="login()">Login</button>
-    </div>
-    <div class="form-container" id="upload-container">
-        <h2>ပစ္စည်းတင်ရန်</h2>
-        <input type="file" id="image" accept="image/*" required>
-        <input type="text" id="name" placeholder="ပစ္စည်းနာမည်" required>
-        <textarea id="description" placeholder="ပစ္စည်းအကြောင်းအရာ" required></textarea>
-        <input type="number" id="price" placeholder="တန်ဖိုး (MMK)" required>
-        <input type="date" id="date" required>
-        <input type="text" id="phone" placeholder="ငွေလွှဲရန် ဖုန်းနံပါတ် (Kpay/Wave)" value="09786284670" readonly>
-        <button onclick="uploadProduct()">Upload Order</button>
-        <button onclick="logout()">Logout</button>
-
-        <div class="history" id="upload-history"></div>
+    <div class="container">
+        <div class="form-container animate__animated animate__fadeIn" id="login-container">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label for="email">အီးမေးလ်</label>
+                <input type="email" id="email" class="form-control" placeholder="အီးမေးလ်လိပ်စာထည့်ပါ" required>
+            </div>
+            <div class="form-group">
+                <label for="password">စကားဝှက်</label>
+                <input type="password" id="password" class="form-control" placeholder="စကားဝှက်ထည့်ပါ" required>
+            </div>
+            <button class="btn" onclick="login()">ဝင်ရောက်မည်</button>
+        </div>
+        
+        <div class="form-container animate__animated animate__fadeIn" id="upload-container" style="display: none;">
+            <h2>ပစ္စည်းတင်ရန်</h2>
+            <div class="image-preview" id="image-preview">
+                <div class="image-preview-placeholder">ပုံရွေးချယ်ပါ</div>
+            </div>
+            <div class="form-group">
+                <label for="image">ပစ္စည်းပုံ</label>
+                <input type="file" id="image" class="form-control" accept="image/*" required onchange="previewImage(this)">
+            </div>
+            <div class="form-group">
+                <label for="name">ပစ္စည်းနာမည်</label>
+                <input type="text" id="name" class="form-control" placeholder="ပစ္စည်းနာမည်ထည့်ပါ" required>
+            </div>
+            <div class="form-group">
+                <label for="description">ပစ္စည်းအကြောင်းအရာ</label>
+                <textarea id="description" class="form-control" placeholder="ပစ္စည်းအကြောင်းအရာထည့်ပါ" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="price">တန်ဖိုး (MMK)</label>
+                <input type="number" id="price" class="form-control" placeholder="တန်ဖိုးထည့်ပါ" required>
+            </div>
+            <div class="form-group">
+                <label for="date">ရက်စွဲ</label>
+                <input type="date" id="date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">ငွေလွှဲရန် ဖုန်းနံပါတ် (Kpay/Wave)</label>
+                <input type="text" id="phone" class="form-control" value="09786284670" required>
+            </div>
+            <button class="btn" onclick="uploadProduct()">ပစ္စည်းတင်မည်</button>
+            <button class="btn btn-secondary" onclick="logout()">ထွက်မည်</button>
+        </div>
+        
+        <div class="history animate__animated animate__fadeIn" id="upload-history" style="display: none;">
+            <h2>ပစ္စည်းစာရင်း</h2>
+            <div id="history-content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Constants
         const VALID_EMAIL = 'wechatopper@gmail.com';
         const VALID_PASSWORD = '155872';
-
+        
+        // Initialize Pusher
         const pusher = new Pusher('8c2540a0c402d0c7aafe', {
             cluster: 'ap1',
             encrypted: true
         });
+        
         const productChannel = pusher.subscribe('products');
-
+        
+        // Event listeners
         productChannel.bind('productUpdated', () => {
+            console.log('Products updated via Pusher');
             fetchHistory();
         });
-
+        
+        // Login function
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -59,19 +474,64 @@
             if (email === VALID_EMAIL && password === VALID_PASSWORD) {
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('upload-container').style.display = 'block';
+                document.getElementById('upload-history').style.display = 'block';
                 fetchHistory();
-                localStorage.setItem('isLoggedIn', 'true'); // ဝင်ပြီးသား အမှတ်အသား သိမ်းထားမယ်
+                
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('date').value = today;
+                
+                // Save login state
+                localStorage.setItem('isLoggedIn', 'true');
+                
+                showSuccessMessage('အကောင့်ဝင်ရောက်မှု အောင်မြင်ပါသည်');
+                console.log('Admin login successful');
             } else {
-                alert('အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါ။');
+                showErrorMessage('အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါ');
+                console.error('Login failed: Invalid credentials');
             }
         }
-
+        
+        // Logout function
         function logout() {
             localStorage.removeItem('isLoggedIn');
             document.getElementById('login-container').style.display = 'block';
             document.getElementById('upload-container').style.display = 'none';
+            document.getElementById('upload-history').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('image').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('image-preview').innerHTML = '<div class="image-preview-placeholder">ပုံရွေးချယ်ပါ</div>';
+            
+            console.log('Admin logged out');
         }
-
+        
+        // Preview image before upload
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = '<div class="image-preview-placeholder">ပုံရွေးချယ်ပါ</div>';
+            }
+        }
+        
+        // Upload product
         async function uploadProduct() {
             const image = document.getElementById('image').files[0];
             const name = document.getElementById('name').value;
@@ -80,9 +540,21 @@
             const date = document.getElementById('date').value;
             const phone = document.getElementById('phone').value;
 
-            if (image && name && description && price && date && phone) {
+            if (!image || !name || !description || !price || !date || !phone) {
+                showErrorMessage('အချက်အလက်အားလုံး ဖြည့်ပါ');
+                console.error('Upload failed: Missing fields');
+                return;
+            }
+            
+            try {
+                // Show loading message
+                showSuccessMessage('ပုံတင်နေပါသည်...');
+                
+                // Upload image to Imgur
                 const imageUrl = await uploadImage(image);
+                
                 if (imageUrl) {
+                    // Prepare product data
                     const productData = {
                         action: 'uploadProduct',
                         image: imageUrl,
@@ -94,94 +566,238 @@
                         id: Date.now().toString(),
                         soldOut: false
                     };
+                    
+                    // Send to server
                     const response = await fetch('/.netlify/functions/data', {
                         method: 'POST',
                         body: JSON.stringify(productData)
                     });
+                    
                     if (response.ok) {
-                        alert('ပစ္စည်းတင်ပြီးပါပြီ။');
-                        fetchHistory();
+                        // Clear form
                         document.getElementById('image').value = '';
                         document.getElementById('name').value = '';
                         document.getElementById('description').value = '';
                         document.getElementById('price').value = '';
-                        document.getElementById('date').value = '';
+                        document.getElementById('image-preview').innerHTML = '<div class="image-preview-placeholder">ပုံရွေးချယ်ပါ</div>';
+                        
+                        showSuccessMessage('ပစ္စည်းတင်ပြီးပါပြီ');
+                        console.log('Product uploaded successfully:', productData);
+                        fetchHistory();
                     } else {
-                        alert('ပစ္စည်းတင်ရာတွင် အမှားအယွင်းရှိပါသည်။');
+                        const error = await response.json();
+                        throw new Error(error.message || 'Server error');
                     }
                 } else {
-                    alert('ပုံတင်ရာတွင် အမှားအယွင်းရှိပါသည်။');
+                    throw new Error('Image upload failed');
                 }
-            } else {
-                alert('အကွက်အားလုံး ဖြည့်ပါ။');
+            } catch (error) {
+                showErrorMessage('ပစ္စည်းတင်ရာတွင် အမှားအယွင်းရှိပါသည်');
+                console.error('Upload error:', error);
             }
         }
-
+        
+        // Upload image to Imgur
         async function uploadImage(file) {
             const formData = new FormData();
             formData.append('image', file);
+            
             try {
                 const response = await fetch('https://api.imgur.com/3/image', {
                     method: 'POST',
                     headers: { Authorization: 'Client-ID be0d52c6d1693d0' },
                     body: formData
                 });
+                
                 const data = await response.json();
+                
                 if (data.success) {
+                    console.log('Image uploaded to Imgur:', data.data.link);
                     return data.data.link;
                 } else {
                     console.error('Imgur Error:', data);
+                    showErrorMessage('ပုံတင်ရာတွင် အမှားအယွင်းရှိပါသည်');
                     return null;
                 }
             } catch (error) {
-                console.error('Upload Error:', error);
+                console.error('Image upload error:', error);
+                showErrorMessage('ပုံတင်ရာတွင် အမှားအယွင်းရှိပါသည်');
                 return null;
             }
         }
-
+        
+        // Fetch product history
         async function fetchHistory() {
-            const response = await fetch('/.netlify/functions/data?action=getProducts');
-            const products = await response.json();
-            const history = document.getElementById('upload-history');
-            history.innerHTML = '';
-            products.forEach(product => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <span>${product.name} - ${product.price} MMK ${product.soldOut ? '(Sold Out)' : ''}</span>
-                    <div>
-                        <button onclick="deleteProduct('${product.id}')">ဖျက်မည်</button>
-                        <button onclick="editProduct('${product.id}')">ပြင်မည်</button>
+            const historyContent = document.getElementById('history-content');
+            historyContent.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+            
+            try {
+                const response = await fetch('/.netlify/functions/data?action=getProducts');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                
+                const products = await response.json();
+                historyContent.innerHTML = '';
+                
+                if (products.length === 0) {
+                    historyContent.innerHTML = `
+                        <div class="empty-state">
+                            <img src="/assets/empty-box.png" alt="No Products">
+                            <h3>ပစ္စည်းများ မရှိသေးပါ</h3>
+                            <p>ပစ္စည်းအသစ်တင်ရန် အပေါ်မှ ဖောင်ကို အသုံးပြုပါ</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                products.forEach(product => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item animate__animated animate__fadeIn';
+                    
+                    item.innerHTML = `
+                        <div class="history-item-content">
+                            <img src="${product.image}" alt="${product.name}" class="history-item-image">
+                            <div class="history-item-details">
+                                <h3>${product.name} ${product.soldOut ? '<span class="sold-out-badge">ရောင်းပြီး</span>' : ''}</h3>
+                                <p>${formatPrice(product.price)} MMK</p>
+                                <p>ရက်စွဲ: ${formatDate(product.date)}</p>
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn edit-btn" onclick="editProduct('${product.id}')">ပြင်မည်</button>
+                            <button class="action-btn delete-btn" onclick="deleteProduct('${product.id}')">ဖျက်မည်</button>
+                        </div>
+                    `;
+                    
+                    historyContent.appendChild(item);
+                });
+                
+                console.log(`Fetched ${products.length} products`);
+            } catch (error) {
+                historyContent.innerHTML = `
+                    <div class="empty-state">
+                        <h3>ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်</h3>
+                        <p>နောက်မှ ထပ်စမ်းကြည့်ပါ</p>
                     </div>
                 `;
-                history.appendChild(item);
-            });
-        }
-
-        async function deleteProduct(id) {
-            await fetch('/.netlify/functions/data', {
-                method: 'POST',
-                body: JSON.stringify({ action: 'deleteProduct', id })
-            });
-            fetchHistory();
-        }
-
-        async function editProduct(id) {
-            const name = prompt('အသစ်ပြင်မည့် နာမည်:');
-            if (name) {
-                await fetch('/.netlify/functions/data', {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'editProduct', id, name })
-                });
-                fetchHistory();
+                console.error('Error fetching products:', error);
             }
         }
-
+        
+        // Delete product
+        async function deleteProduct(id) {
+            if (!confirm('ဤပစ္စည်းကို ဖျက်ရန် သေချာပါသလား?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'deleteProduct', id })
+                });
+                
+                if (response.ok) {
+                    showSuccessMessage('ပစ္စည်းဖျက်ပြီးပါပြီ');
+                    console.log('Product deleted:', id);
+                    fetchHistory();
+                } else {
+                    throw new Error('Failed to delete product');
+                }
+            } catch (error) {
+                showErrorMessage('ပစ္စည်းဖျက်ရာတွင် အမှားဖြစ်ပါသည်');
+                console.error('Delete error:', error);
+            }
+        }
+        
+        // Edit product
+        async function editProduct(id) {
+            const newName = prompt('အသစ်ပြင်မည့် နာမည်:');
+            
+            if (!newName) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'editProduct', 
+                        id, 
+                        updates: { name: newName }
+                    })
+                });
+                
+                if (response.ok) {
+                    showSuccessMessage('ပစ္စည်းပြင်ဆင်ပြီးပါပြီ');
+                    console.log('Product edited:', id);
+                    fetchHistory();
+                } else {
+                    throw new Error('Failed to edit product');
+                }
+            } catch (error) {
+                showErrorMessage('ပစ္စည်းပြင်ဆင်ရာတွင် အမှားဖြစ်ပါသည်');
+                console.error('Edit error:', error);
+            }
+        }
+        
+        // Show success message
+        function showSuccessMessage(message) {
+            // Remove any existing messages
+            const existingMessages = document.querySelectorAll('.success-message, .error-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            const msgElement = document.createElement('div');
+            msgElement.className = 'success-message';
+            msgElement.textContent = message;
+            document.body.appendChild(msgElement);
+            
+            setTimeout(() => {
+                msgElement.remove();
+            }, 3000);
+        }
+        
+        // Show error message
+        function showErrorMessage(message) {
+            // Remove any existing messages
+            const existingMessages = document.querySelectorAll('.success-message, .error-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            const msgElement = document.createElement('div');
+            msgElement.className = 'error-message';
+            msgElement.textContent = message;
+            document.body.appendChild(msgElement);
+            
+            setTimeout(() => {
+                msgElement.remove();
+            }, 3000);
+        }
+        
+        // Format price with commas
+        function formatPrice(price) {
+            return Number(price).toLocaleString('en-US');
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('my-MM', options);
+        }
+        
+        // Initialize on page load
         window.onload = () => {
             if (localStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('upload-container').style.display = 'block';
+                document.getElementById('upload-history').style.display = 'block';
+                
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('date').value = today;
+                
                 fetchHistory();
+                console.log('Admin session restored');
             }
         };
     </script>
