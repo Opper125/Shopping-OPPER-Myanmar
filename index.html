@@ -4,299 +4,335 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping OPPER Myanmar</title>
-    <meta name="description" content="ခေတ်မီဒီဇိုင်းနဲ့ ပစ္စည်းအမျိုးမျိုးကို တိုက်ရိုက်ဝယ်ယူနိုင်တဲ့ နေရာ">
-    
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css">
-    
-    <!-- Realtime Updates -->
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <style>
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+        .header img {
+            width: 150px;
+            animation: fadeIn 1s ease-in;
+        }
+        .user-id {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .nav {
+            background: #2c3e50;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .nav a:hover {
+            color: #3498db;
+            transform: scale(1.1);
+        }
+        .nav img {
+            width: 20px;
+            margin-right: 5px;
+        }
+        .products, .orders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+        .product-card, .order-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: slideIn 0.5s ease;
+            position: relative;
+        }
+        .product-card img, .order-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .sold-out {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            opacity: 0.9;
+            z-index: 1;
+        }
+        .order-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+        .order-btn:hover {
+            background: #219653;
+        }
+        .order-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            background: #f1f1f1;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .payment-option img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        .status-pending { background: rgba(241, 196, 15, 0.3); padding: 5px; border-radius: 3px; }
+        .status-approved { background: rgba(46, 204, 113, 0.3); padding: 5px; border-radius: 3px; }
+        .status-rejected { background: rgba(231, 76, 60, 0.3); padding: 5px; border-radius: 3px; }
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: -300px; /* ဘယ်ဘက်ကနေ စမယ် */
+            transform: translateY(-50%);
+            background: rgba(46, 204, 113, 0.9); /* အစိမ်းရောင် */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 18px;
+            z-index: 1000;
+            animation: slideInOut 3s ease-in-out forwards;
+        }
+        @keyframes slideInOut {
+            0% { left: -300px; }
+            50% { left: 50%; transform: translate(-50%, -50%); }
+            100% { left: 100%; transform: translate(0, -50%); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            .nav a { font-size: 14px; }
+            .product-card, .order-card { margin: 10px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="container">
-        <header class="header">
-            <img src="https://github.com/Opper125/Shopping-OPPER-Myanmar/raw/main/opper.png" alt="Shopping OPPER Myanmar Logo" class="logo">
-            <div class="user-id" id="user-id">
-                <i class="fas fa-user"></i> <span>အကောင့်နံပါတ်</span>
-            </div>
-        </header>
-        
-        <!-- Search Bar -->
-        <form id="search-form" class="search-bar">
-            <input type="text" id="search-input" placeholder="ပစ္စည်းများ ရှာဖွေရန်...">
-            <button type="submit" id="search-button">
-                <i class="fas fa-search"></i> ရှာဖွေမည်
-            </button>
-        </form>
-    </div>
-    
-    <!-- Pages Container -->
-    <div class="container">
-        <!-- Home Page -->
-        <div id="home-page">
-            <!-- Featured Products -->
-            <section class="featured-section">
-                <h2 class="section-title animate-float">
-                    <i class="fas fa-crown"></i> ရွေးချယ်ထားသော ပစ္စည်းများ
-                </h2>
-                
-                <div class="categories">
-                    <div class="category-item active">
-                        <i class="fas fa-star"></i> အားလုံး
-                    </div>
-                    <div class="category-item">
-                        <i class="fas fa-mobile-alt"></i> ဖုန်းများ
-                    </div>
-                    <div class="category-item">
-                        <i class="fas fa-tshirt"></i> အဝတ်အထည်
-                    </div>
-                    <div class="category-item">
-                        <i class="fas fa-laptop"></i> ကွန်ပျူတာ
-                    </div>
-                    <div class="category-item">
-                        <i class="fas fa-headphones"></i> အသံပစ္စည်း
-                    </div>
-                </div>
-                
-                <div id="featured-products" class="products">
-                    <!-- Products will be loaded here via JavaScript -->
-                </div>
-                
-                <div class="text-center my-3">
-                    <button class="btn btn-primary" onclick="showPage('products-page')">
-                        <i class="fas fa-th-list"></i> ပစ္စည်းအားလုံးကြည့်ရန်
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Latest News -->
-            <section class="news-section">
-                <h2 class="section-title animate-float">
-                    <i class="fas fa-newspaper"></i> နောက်ဆုံးရသတင်းများ
-                </h2>
-                
-                <div id="latest-posts" class="posts">
-                    <!-- Posts will be loaded here via JavaScript -->
-                </div>
-                
-                <div class="text-center my-3">
-                    <button class="btn btn-primary" onclick="showPage('posts-page')">
-                        <i class="fas fa-newspaper"></i> သတင်းအားလုံးကြည့်ရန်
-                    </button>
-                </div>
-            </section>
-            
-            <!-- About Section -->
-            <section class="about-section">
-                <h2><i class="fas fa-info-circle"></i> Shopping OPPER Myanmar အကြောင်း</h2>
-                <p>Shopping OPPER Myanmar သည် မြန်မာနိုင်ငံတွင် အရည်အသွေးမြင့် ပစ္စည်းများကို စျေးနှုန်းသင့်တင့်စွာဖြင့် ဝယ်ယူနိုင်ရန် ရည်ရွယ်၍ ဖွင့်လှစ်ထားသော အွန်လိုင်းစျေးဝယ်ဝက်ဘ်ဆိုက်ဖြစ်ပါသည်။</p>
-                <p>ကျွန်ုပ်တို့ထံမှ ဝယ်ယူရသည့် အကြောင်းရင်းများ:</p>
-                <ul>
-                    <li>စိတ်ချရသော ပစ္စည်းအရည်အသွေး</li>
-                    <li>မြန်ဆန်သော ပို့ဆောင်မှု</li>
-                    <li>online (သို့) အိမ်ရောင်ငွေချေ </li>
-                    <li>၂၄/၇ ဝန်ဆောင်မှု</li>
-                </ul>
-                <p>ဆက်သွယ်ရန် <a href="tel:+9509786284670">09-786–284–670</a> (သို့) <a href="mailto:crakb68@gmail.com">crakb68@gmail.com</a></p>
-            </section>
+        <div class="header">
+            <img src="/assets/logo.png" alt="OPPER Logo">
+            <div class="user-id">ID: <span id="user-id"></span></div>
         </div>
-        
-        <!-- Products Page -->
-        <div id="products-page" style="display: none;">
-            <h2 class="section-title">
-                <i class="fas fa-shopping-basket"></i> ပစ္စည်းများ
-            </h2>
-            
-            <div class="categories">
-                <div class="category-item active">
-                    <i class="fas fa-star"></i> အားလုံး
-                </div>
-                <div class="category-item">
-                    <i class="fas fa-mobile-alt"></i> ဖုန်းများ
-                </div>
-                <div class="category-item">
-                    <i class="fas fa-tshirt"></i> အဝတ်အထည်
-                </div>
-                <div class="category-item">
-                    <i class="fas fa-laptop"></i> ကွန်ပျူတာ
-                </div>
-                <div class="category-item">
-                    <i class="fas fa-headphones"></i> အသံပစ္စည်း
-                </div>
-            </div>
-            
-            <div id="products-container" class="products">
-                <!-- Products will be loaded here via JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Orders Page -->
-        <div id="orders-page" style="display: none;">
-            <h2 class="section-title">
-                <i class="fas fa-shopping-cart"></i> အမှာစာများ
-            </h2>
-            
-            <div id="orders-container" class="orders">
-                <!-- Orders will be loaded here via JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Posts/News Page -->
-        <div id="posts-page" style="display: none;">
-            <h2 class="section-title">
-                <i class="fas fa-newspaper"></i> သတင်းများ
-            </h2>
-            
-            <div id="posts-container" class="posts">
-                <!-- Posts will be loaded here via JavaScript -->
-            </div>
-        </div>
-        
-        <!-- About Page -->
-        <div id="about-page" style="display: none;">
-            <h2 class="section-title">
-                <i class="fas fa-info-circle"></i> အကြောင်းအရာ
-            </h2>
-            
-            <div class="about-section">
-                <h2>Shopping OPPER Myanmar အကြောင်း</h2>
-                <p>Shopping OPPER Myanmar သည် မြန်မာနိုင်ငံတွင် အရည်အသွေးမြင့် ပစ္စည်းများကို စျေးနှုန်းသင့်တင့်စွာဖြင့် ဝယ်ယူနိုင်ရန် ရည်ရွယ်၍ ဖွင့်လှစ်ထားသော အွန်လိုင်းစျေးဝယ်ဝက်ဘ်ဆိုက်ဖြစ်ပါသည်။</p>
-                
-                <h3 class="mt-4">ကျွန်ုပ်တို့၏ရည်မှန်းချက်</h3>
-                <p>မြန်မာနိုင်ငံရှိ ဈေးဝယ်သူများအတွက် လုံခြုံစိတ်ချရပြီး အရည်အသွေးမြင့်မားသော ဝန်ဆောင်မှုပေးရန်ဖြစ်သည်။ ကျွန်ုပ်တို့သည် ဖောက်သည်များ၏ စိတ်ကျေနပ်မှုနှင့် ယုံကြည်မှုကို အမြဲဦးစားပေးပါသည်။</p>
-                
-                <h3 class="mt-4">ကျွန်ုပ်တို့၏ဝန်ဆောင်မှုများ</h3>
-                <ul>
-                    <li><strong>မြန်ဆန်သော ပို့ဆောင်မှု</strong> - ရန်ကုန်မြို့တွင်း တစ်ရက်အတွင်း၊ နယ်မြို့များသို့ ၃-၅ ရက်အတွင်း</li>
-                    <li><strong>အသုံးပြုရလွယ်ကူသော ဝက်ဘ်ဆိုက်</strong> - မည်သည့်စမတ်ဖုန်း သို့မဟုတ် ကွန်ပျူတာမှမဆို ဝယ်ယူနိုင်</li>
-                    <li><strong>ငွေပေးချေမှုနည်းလမ်းမျိုးစုံ</strong> - Wave Money, KBZ Pay</li>
-                    <li><strong>ဝယ်ယူပြီးနောက် ဝန်ဆောင်မှု</strong> - ပစ္စည်းနှင့်ပတ်သက်သော မေးခွန်းများနှင့် ပြဿနာများအတွက် ၂၄နာရီ ဆက်သွယ်နိုင်</li>
-                </ul>
-                
-                <h3 class="mt-4">ဆက်သွယ်ရန်</h3>
-                <p>
-                    <i class="fas fa-phone"></i> <a href="tel:+9509786284670">09-786-284-670</a><br>
-                    <i class="fas fa-envelope"></i> <a href="mailto:crakb68@gmail.com">crakb68@gmail.com</a><br>
-                    <i class="fas fa-map-marker-alt"></i> အမှတ် 432 သာကေသ ဒေါ်ပုံမြို့နယ် နွယ်အေးရပ်ကွက် သဇင်နွယ် 1 လမ်း
-                </p>
-                
-                <h3 class="mt-4">ကျွန်ုပ်တို့နှင့် ချိတ်ဆက်ပါ</h3>
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="https://t.me/OPPERN" class="social-link"><i class="fab fa-telegram"></i></a>
-                    <a href="+959786284670" class="social-link"><i class="fab fa-viber"></i></a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sign Up Page -->
-        <div id="signup-page" style="display: none;">
-            <h2 class="section-title">
-                <i class="fas fa-user-plus"></i> အကောင့်ဖွင့်ရန်
-            </h2>
-            
-            <div class="signup-container">
-                <h2>အကောင့်အသစ်ဖွင့်ခြင်း</h2>
-                
-                <form id="signup-form" class="mt-4">
-                    <div class="form-group">
-                        <label for="signup-name">အမည် <span class="required">*</span></label>
-                        <input type="text" id="signup-name" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-email">အီးမေးလ် <span class="required">*</span></label>
-                        <input type="email" id="signup-email" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-phone">ဖုန်းနံပါတ် <span class="required">*</span></label>
-                        <input type="tel" id="signup-phone" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-address">နေရပ်လိပ်စာ</label>
-                        <textarea id="signup-address" class="form-control"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-password">စကားဝှက် <span class="required">*</span></label>
-                        <input type="password" id="signup-password" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-confirm-password">စကားဝှက်အတည်ပြုခြင်း <span class="required">*</span></label>
-                        <input type="password" id="signup-confirm-password" class="form-control" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> အကောင့်ဖွင့်မည်
-                    </button>
-                </form>
-            </div>
+        <div id="content">
+            <div class="products" id="product-list"></div>
+            <div class="orders" id="order-list" style="display: none;"></div>
         </div>
     </div>
-    
-    <!-- Bottom Navigation -->
-    <nav class="nav">
-        <a href="#" data-page="home-page" class="active">
-            <i class="fas fa-home"></i>
-            <span>ပင်မစာမျက်နှာ</span>
-        </a>
-        <a href="#" data-page="products-page">
-            <i class="fas fa-shopping-basket"></i>
-            <span>ပစ္စည်းများ</span>
-        </a>
-        <a href="#" data-page="orders-page">
-            <i class="fas fa-shopping-cart"></i>
-            <span>အမှာစာများ</span>
-        </a>
-        <a href="#" data-page="posts-page">
-            <i class="fas fa-newspaper"></i>
-            <span>သတင်းများ</span>
-        </a>
-        <a href="#" data-action="login">
-            <i class="fas fa-sign-in-alt"></i>
-            <span>အကောင့်ဝင်ရန်</span>
-        </a>
-    </nav>
-    
-    <!-- Modals -->
-    <!-- Order Modal -->
-    <div id="order-modal" class="modal">
-        <div class="modal-content">
-            <!-- Content will be loaded via JavaScript -->
-        </div>
+    <div class="nav">
+        <a href="#home" onclick="showSection('product-list')"><img src="/assets/home-icon.png" alt="Home">Home</a>
+        <a href="#orderhost" onclick="showSection('order-list')"><img src="/assets/order-icon.png" alt="Order">Orderhost</a>
+        <a href="#about" onclick="showAbout()"><img src="/assets/about-icon.png" alt="About">About</a>
     </div>
-    
-    <!-- Post Modal -->
-    <div id="post-modal" class="modal">
-        <div class="modal-content">
-            <!-- Content will be loaded via JavaScript -->
-        </div>
-    </div>
-    
-    <!-- Order Detail Modal -->
-    <div id="order-detail-modal" class="modal">
-        <div class="modal-content">
-            <!-- Content will be loaded via JavaScript -->
-        </div>
-    </div>
-    
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <!-- Content will be loaded via JavaScript -->
-        </div>
-    </div>
-    
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+
+    <script>
+        const userId = localStorage.getItem('userId') || Math.random().toString(36).substr(2, 6);
+        localStorage.setItem('userId', userId);
+        document.getElementById('user-id').textContent = userId;
+
+        const pusher = new Pusher('8c2540a0c402d0c7aafe', {
+            cluster: 'ap1',
+            encrypted: true
+        });
+        const channel = pusher.subscribe('orders-' + userId);
+        const productChannel = pusher.subscribe('products');
+
+        channel.bind('orderUpdated', (data) => {
+            if (data.userId === userId) {
+                fetchOrders();
+                fetchProducts();
+            }
+        });
+
+        productChannel.bind('productUpdated', () => {
+            fetchProducts();
+        });
+
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/.netlify/functions/data?action=getProducts');
+                if (!response.ok) throw new Error('Failed to fetch products');
+                const products = await response.json();
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        ${product.soldOut ? '<img src="/assets/soldout-icon.png" class="sold-out" alt="Sold Out">' : ''}
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p>တန်ဖိုး: ${product.price} MMK</p>
+                        <p>ရက်စွဲ: ${product.date}</p>
+                        <div class="payment-option">
+                            <img src="/assets/kpay-logo.png" alt="Kpay">
+                            <span>Kpay: 09786284670 (DHMK)</span>
+                        </div>
+                        <div class="payment-option">
+                            <img src="/assets/wave-logo.png" alt="Wave">
+                            <span>Wave: 09786284670 (DHMK)</span>
+                        </div>
+                        <button class="order-btn" ${product.soldOut ? 'disabled' : ''} onclick="orderProduct('${product.id}', '${product.name}', '${product.image}')">
+                            ${product.soldOut ? 'Sold Out' : 'မှာယူမည်'}
+                        </button>
+                    `;
+                    productList.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                alert('ပစ္စည်းများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+            }
+        }
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/.netlify/functions/data?action=getOrders');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                const orders = await response.json();
+                const orderList = document.getElementById('order-list');
+                orderList.innerHTML = '';
+                orders.forEach(order => {
+                    if (order.userId === userId) {
+                        const card = document.createElement('div');
+                        card.className = 'order-card';
+                        card.innerHTML = `
+                            <img src="${order.productImage}" alt="${order.productName}">
+                            <h3>${order.productName}</h3>
+                            <p>ငွေလွှဲနည်း: ${order.paymentMethod}</p>
+                            <p>ငွေလွှဲနံပါတ်: ${order.transactionId}</p>
+                            <p>Telegram: @${order.telegramUsername}</p>
+                            <p>အချိန်: ${new Date(order.orderTime).toLocaleString()}</p>
+                            <p>အခြေအနေ: <span class="status-${order.status === 'ဆိုင်းငံ့' ? 'pending' : order.status === 'အတည်ပြု' ? 'approved' : 'rejected'}">${order.status}</span></p>
+                        `;
+                        orderList.appendChild(card);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                alert('မှာယူမှုများ ဆွဲထုတ်ရာတွင် အမှားဖြစ်ပါသည်။');
+            }
+        }
+
+        async function orderProduct(productId, productName, productImage) {
+            const paymentMethod = prompt("ငွေလွှဲနည်းလမ်း (Kpay/Wave) ရွေးပါ:");
+            const transactionId = prompt("ငွေလွှဲလုပ်ငန်းစဉ် နောက်ဆုံး ၆ လုံးထည့်ပါ:");
+            const telegramUsername = prompt("Telegram Username ထည့်ပါ:");
+            if (paymentMethod && transactionId && telegramUsername) {
+                try {
+                    const orderData = {
+                        action: 'placeOrder',
+                        productId,
+                        productName,
+                        productImage,
+                        transactionId: transactionId.slice(-6),
+                        telegramUsername,
+                        paymentMethod,
+                        status: 'ဆိုင်းငံ့',
+                        orderTime: new Date().toISOString(),
+                        userId,
+                        id: Date.now().toString()
+                    };
+                    const response = await fetch('/.netlify/functions/data', {
+                        method: 'POST',
+                        body: JSON.stringify(orderData)
+                    });
+                    if (response.ok) {
+                        showSuccessMessage();
+                        fetchProducts();
+                        fetchOrders();
+                    } else {
+                        alert('မှာယူမှု မအောင်မြင်ပါ။');
+                    }
+                } catch (error) {
+                    console.error('Error placing order:', error);
+                    alert('မှာယူမှု လုပ်ရာတွင် အမှားဖြစ်ပါသည်။');
+                }
+            }
+        }
+
+        function showSuccessMessage() {
+            const message = document.createElement('div');
+            message.className = 'success-message';
+            message.textContent = 'အောင်မြင်ပါသည်';
+            document.body.appendChild(message);
+            setTimeout(() => {
+                message.remove();
+            }, 3000); // 3 စက္ကန့်ပြီး ဖျက်မယ်
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('product-list').style.display = sectionId === 'product-list' ? 'grid' : 'none';
+            document.getElementById('order-list').style.display = sectionId === 'order-list' ? 'grid' : 'none';
+            if (sectionId === 'product-list') fetchProducts();
+            if (sectionId === 'order-list') fetchOrders();
+        }
+
+        function showAbout() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2>ကျွန်ုပ်တို့အကြောင်း</h2>
+                <p>Email: crakb68@gmail.com</p>
+                <p>Phone: 09983254678</p>
+                <p>Telegram: <a href="https://t.me/OPPERN">t.me/OPPERN</a></p>
+                <p>လိပ်စာ: Yangon No 34, Ayarwade GG 9</p>
+            `;
+        }
+
+        window.onload = () => {
+            fetchProducts();
+            fetchOrders();
+        };
+    </script>
 </body>
 </html>
